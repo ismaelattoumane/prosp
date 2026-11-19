@@ -1,0 +1,1034 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prospecteur (gratuit)</title>
+<style>
+  :root{--bg:#0e1110;--side:#131716;--card:#171b1a;--card2:#1c211f;--bd:#262c2a;--fg:#e8ebe9;--mut:#8b9591;--ac:#4cc592;--acd:#1f4d3b;--hot:#fb923c;--warm:#facc15;color-scheme:dark}
+  [hidden]{display:none!important}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{background:var(--bg);color:var(--fg);font:14.5px/1.5 system-ui,-apple-system,sans-serif;display:flex}
+  aside{width:230px;flex:0 0 230px;background:var(--side);border-right:1px solid var(--bd);height:100vh;position:sticky;top:0;display:flex;flex-direction:column;padding:18px 12px}
+  .logo{display:flex;align-items:center;gap:10px;padding:4px 10px 18px;font-weight:700;font-size:16px}
+  .logo i{width:28px;height:28px;border-radius:8px;background:var(--ac);display:grid;place-items:center;color:#0e1110;font-style:normal;font-size:15px}
+  nav{display:flex;flex-direction:column;gap:3px}
+  nav button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:transparent;color:var(--mut);border:0;border-radius:8px;padding:9px 10px;font-size:14px;cursor:pointer;font-family:inherit}
+  nav button:hover{background:var(--card);color:var(--fg)}
+  nav button.on{background:var(--acd);color:var(--ac)}
+  nav .ic{width:18px;text-align:center}
+  nav .n{margin-left:auto;font-size:11px;background:var(--card2);border:1px solid var(--bd);color:var(--mut);border-radius:99px;padding:0 7px}
+  .stats{margin-top:auto;border-top:1px solid var(--bd);padding:14px 10px 4px;font-size:12px;color:var(--mut);display:grid;gap:4px}
+  .stats b{color:var(--fg)}
+  .content{flex:1;min-width:0;padding:28px 30px}
+  .wrap{max-width:1080px;margin:auto}
+  h1{font-size:21px;margin:0 0 3px}
+  p.sub{color:var(--mut);margin:0 0 20px}
+  .card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px;margin-bottom:14px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+  label{display:flex;flex-direction:column;font-size:12px;color:var(--mut);gap:4px;flex:1;min-width:140px}
+  input,select{padding:9px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--fg);font-size:14px;font-family:inherit}
+  input:focus,select:focus{outline:1px solid var(--ac);border-color:var(--ac)}
+  button.btn{padding:9px 16px;border:0;border-radius:8px;background:var(--ac);color:#0e1110;font-weight:600;font-size:14px;cursor:pointer;font-family:inherit}
+  button.sec{padding:8px 13px;background:transparent;color:var(--fg);border:1px solid var(--bd);border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit}
+  button.sec:hover{background:var(--card2)}
+  button:disabled{opacity:.5;cursor:wait}
+  .chk{flex-direction:row;align-items:center;gap:7px;color:var(--fg);font-size:13.5px;min-width:auto;flex:none}
+  .chk input{accent-color:var(--ac)}
+  table{width:100%;border-collapse:collapse}
+  th,td{text-align:left;padding:10px 7px;border-bottom:1px solid var(--bd);vertical-align:top}
+  th{font-size:11.5px;color:var(--mut);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+  tr:last-child td{border-bottom:0}
+  .badge{display:inline-block;font-size:12px;font-weight:600;padding:2px 9px;border-radius:99px;border:1px solid var(--bd);white-space:nowrap;color:var(--mut)}
+  .b-hot{color:var(--hot);border-color:var(--hot);background:#fb923c14}
+  .b-warm{color:var(--warm);border-color:var(--warm);background:#facc1512}
+  .tag{font-size:11px;padding:1px 7px;border-radius:99px;border:1px solid var(--bd);color:var(--mut)}
+  .new{color:var(--ac);border-color:var(--ac)}
+  #status{color:var(--mut);margin:2px 0 12px;font-size:13px;min-height:20px}
+  a{color:var(--ac);text-decoration:none}a:hover{text-decoration:underline}
+  .scroll{overflow-x:auto}
+  small,.mut{color:var(--mut)}
+  input.note{width:100%;min-width:130px}
+  .hist-item{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd);align-items:center}
+  .hist-item:last-child{border-bottom:0}
+  .empty{color:var(--mut);padding:22px 0;text-align:center}
+  .danger{color:#f87171;border-color:#7f1d1d}
+  .info{background:var(--card2);border:1px solid var(--bd);border-radius:10px;padding:11px 14px;font-size:13px;color:var(--mut);margin-bottom:14px}
+  .drawer-bg{position:fixed;inset:0;background:#000a;z-index:50}
+  .drawer{position:fixed;top:0;right:0;bottom:0;width:min(540px,100%);background:var(--side);border-left:1px solid var(--bd);z-index:51;overflow-y:auto;padding:22px 22px 44px}
+  .drawer[hidden],.drawer-bg[hidden]{display:none}
+  .drawer h2{margin:0 0 2px;font-size:20px}
+  .sec-t{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);margin:22px 0 8px;font-weight:600;border-top:1px solid var(--bd);padding-top:14px}
+  .kv{display:grid;grid-template-columns:110px 1fr;gap:6px 10px;font-size:14px}
+  .kv>span:nth-child(odd){color:var(--mut)}
+  .pts{display:flex;justify-content:space-between;font-size:13.5px;padding:4px 0;border-bottom:1px dashed var(--bd)}
+  .drawer textarea{width:100%;min-height:80px;padding:9px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--fg);font:inherit;resize:vertical}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .drawer details{margin-top:8px;color:var(--mut);font-size:12.5px}
+  .drawer pre{white-space:pre-wrap;word-break:break-word;background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:10px;font:12.5px/1.55 ui-monospace,Menlo,Consolas,monospace;margin:6px 0 8px;color:var(--fg)}
+  .linkbtn{background:none;border:0;color:var(--fg);font:inherit;font-weight:700;cursor:pointer;padding:0;text-align:left}
+  .linkbtn:hover{color:var(--ac);text-decoration:underline}
+  .tl{font-size:13px;color:var(--mut);padding:3px 0}
+  a.btnl{display:inline-block;padding:7px 12px;border:1px solid var(--bd);border-radius:8px;color:var(--fg);font-size:13px}
+  a.btnl:hover{background:var(--card2);text-decoration:none}
+  pre#logbox{margin:0;max-height:62vh;overflow:auto;background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:12px;font:12px/1.5 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-word;color:var(--mut)}
+  @media (max-width:760px){
+    body{flex-direction:column}
+    aside{width:100%;flex:none;height:auto;position:static;flex-direction:row;align-items:center;padding:8px;overflow-x:auto;border-right:0;border-bottom:1px solid var(--bd)}
+    .logo{padding:0 8px;white-space:nowrap}.logo span{display:none}
+    nav{flex-direction:row}nav button{white-space:nowrap;padding:8px 10px}
+    .stats{display:none}
+    .content{padding:18px 14px}
+  }
+</style>
+</head>
+<body>
+
+<aside>
+  <div class="logo"><i>◎</i><span>Prospecteur</span></div>
+  <nav>
+    <button data-p="search" class="on"><span class="ic">⌕</span>Recherche</button>
+    <button data-p="leads"><span class="ic">☰</span>Prospects <span class="n" id="nLeads">0</span></button>
+    <button data-p="history"><span class="ic">↺</span>Recherches passées <span class="n" id="nSearches">0</span></button>
+    <button data-p="logs"><span class="ic">&gt;_</span>Logs</button>
+    <button data-p="settings"><span class="ic">⚙</span>Données</button>
+  </nav>
+  <div class="stats">
+    <div>Prospects chauds : <b id="sHot">0</b></div>
+    <div>À contacter : <b id="sTodo">0</b></div>
+    <div>Clients : <b id="sWon">0</b></div>
+    <div>Relances dues : <b id="sRel">0</b></div>
+    <div>Sauvegarde : <b id="sBk">jamais</b></div>
+  </div>
+</aside>
+
+<div class="content"><div class="wrap">
+
+  <section id="p-search">
+    <h1>Recherche <small>· 3 sources</small></h1>
+    <p class="sub">Les prospects s'affichent par ville, notés par potentiel et enregistrés automatiquement.</p>
+    <div class="info" id="srcInfo">OpenStreetMap est collaboratif : certaines fiches n'ont pas de site simplement parce que personne ne l'a renseigné. Utilise le lien <b>Vérifier</b> sur chaque ligne pour confirmer sur Google avant de contacter. Les artisans (électriciens, plombiers…) sont peu renseignés sur OpenStreetMap : utilise <b>★ Tous les artisans</b> pour élargir.</div>
+    <div class="card">
+      <div class="row">
+        <label style="flex:0 0 250px">Source
+          <select id="source">
+            <option value="osm">OpenStreetMap (gratuit)</option>
+            <option value="sirene">Entreprises créées récemment (gratuit)</option>
+            <option value="google">Google Places (clé API)</option>
+          </select>
+        </label>
+        <label>Activité
+          <select id="metier">
+            <option value="shop=hairdresser">Coiffeur</option>
+            <option value="shop=beauty">Institut de beauté / esthétique</option>
+            <option value="amenity=restaurant">Restaurant</option>
+            <option value="amenity=cafe">Café</option>
+            <option value="amenity=bar">Bar</option>
+            <option value="shop=bakery">Boulangerie</option>
+            <option value="shop=butcher">Boucherie</option>
+            <option value="shop=florist">Fleuriste</option>
+            <option value="shop=car_repair">Garage auto</option>
+            <option value="craft=plumber">Plombier</option>
+            <option value="craft=electrician">Électricien</option>
+            <option value="craft=carpenter">Menuisier</option>
+            <option value="craft=painter">Peintre en bâtiment</option>
+            <option value="craft=hvac">Chauffagiste / clim</option>
+            <option value="craft=gardener">Paysagiste / jardinier</option>
+            <option value="craft=photographer">Photographe</option>
+            <option value="shop=clothes">Boutique de vêtements</option>
+            <option value="shop=tattoo">Tatoueur</option>
+            <option value="leisure=fitness_centre">Salle de sport</option>
+            <option value="amenity=dentist">Dentiste</option>
+            <option value="craft=*">★ Tous les artisans (électricien, plombier, maçon…)</option>
+            <option value="shop=*">★ Tous les commerces</option>
+            <option value="office=*">★ Bureaux / professions libérales (agences, cabinets…)</option>
+            <option value="custom">Autre (tag OSM)…</option>
+          </select>
+        </label>
+        <label id="customWrap" hidden><span id="customLbl">Tag OSM (clé=valeur)</span><input id="custom" placeholder="shop=optician"></label>
+        <label id="sinceWrap" hidden style="flex:0 0 150px">Créées depuis<select id="since"><option value="3">3 mois</option><option value="6">6 mois</option><option value="12" selected>12 mois</option><option value="24">24 mois</option></select></label>
+        <label>Ville(s), séparées par des virgules<input id="villes" value="Lyon" placeholder="Lyon, Villeurbanne"></label>
+        <button class="btn" id="go">Chercher</button>
+        <button class="sec" id="cancel" hidden>Annuler</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="row">
+        <label style="flex:0 0 130px">Score minimum<input id="fScore" type="number" min="0" max="100" value="0"></label>
+        <label class="chk"><input type="checkbox" id="fSocial" checked> Facebook/Instagram seul</label>
+        <label class="chk"><input type="checkbox" id="fPhone"> Téléphone obligatoire</label>
+        <label class="chk"><input type="checkbox" id="fVus"> Masquer déjà contactés</label>
+      </div>
+    </div>
+    <div class="info" id="bkWarn" hidden>⚠ <span id="bkWarnTxt"></span> <button class="sec" id="bkNow" style="margin-left:8px">Sauvegarder maintenant</button></div>
+    <div id="status"></div>
+    <div class="card scroll" id="res" hidden>
+      <table>
+        <thead><tr><th>Score</th><th>Entreprise</th><th>Contact</th><th>Infos</th><th>Site</th><th>Statut</th></tr></thead>
+        <tbody id="tb"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="p-leads" hidden>
+    <h1>Prospects</h1>
+    <p class="sub">Tous les prospects enregistrés, avec leur statut et tes notes.</p>
+    <div class="card">
+      <div class="row">
+        <label style="flex:0 0 200px">Statut
+          <select id="hFiltre"><option value="">Tous</option></select>
+        </label>
+        <button class="sec" id="csv">Exporter CSV</button>
+      </div>
+    </div>
+    <div class="card scroll">
+      <table>
+        <thead><tr><th>Score</th><th>Entreprise</th><th>Contact</th><th>Statut</th><th>Note</th><th></th></tr></thead>
+        <tbody id="htb"></tbody>
+      </table>
+      <div class="empty" id="hEmpty" hidden>Aucun prospect enregistré pour l'instant.</div>
+    </div>
+  </section>
+
+  <section id="p-history" hidden>
+    <h1>Recherches passées</h1>
+    <p class="sub">Relance une recherche en un clic.</p>
+    <div class="card" id="searches"></div>
+  </section>
+
+  <section id="p-logs" hidden>
+    <h1>Logs</h1>
+    <p class="sub">Journal détaillé de chaque recherche (géocodage, requêtes, réponses, erreurs).</p>
+    <div class="card">
+      <div class="row" style="margin-bottom:10px">
+        <button class="sec" id="logCopy">Copier les logs</button>
+        <button class="sec" id="logClear">Vider</button>
+      </div>
+      <pre id="logbox">Aucun log pour l'instant. Lance une recherche.</pre>
+    </div>
+  </section>
+
+  <section id="p-settings" hidden>
+    <h1>Données</h1>
+    <p class="sub">Tout est stocké dans ton navigateur, rien n'est envoyé ailleurs (hormis les requêtes aux sources que tu choisis).</p>
+    <div class="card">
+      <strong>Sauvegarde</strong>
+      <p class="mut" style="margin:6px 0 12px">Exporte tous tes prospects, notes, statuts et historique dans un fichier. Importe-le pour tout retrouver après un nettoyage du navigateur ou sur un autre ordinateur (la clé Google n'est jamais incluse).</p>
+      <div class="row">
+        <button class="btn" id="bkExport">Exporter la sauvegarde</button>
+        <label style="flex:0 0 200px">À l'import<select id="bkMode"><option value="merge">Fusionner avec l'existant</option><option value="replace">Remplacer tout</option></select></label>
+        <button class="sec" id="bkImportBtn">Importer une sauvegarde…</button>
+        <input type="file" id="bkFile" accept=".json,application/json" hidden>
+      </div>
+      <p class="mut" id="bkMsg" style="margin:10px 0 0"></p>
+    </div>
+    <div class="card">
+      <strong>Mon profil</strong>
+      <p class="mut" style="margin:6px 0 12px">Utilisé pour la signature des messages d'accroche et le bandeau des maquettes de site.</p>
+      <div class="two">
+        <label>Nom ou entreprise<input data-pf="nom" placeholder="ex : Karim – création de sites"></label>
+        <label>Téléphone<input data-pf="tel" placeholder="06 00 00 00 00"></label>
+        <label>E-mail<input data-pf="email" placeholder="contact@exemple.fr"></label>
+        <label>Site / portfolio<input data-pf="site" placeholder="https://…"></label>
+      </div>
+    </div>
+    <div class="card">
+      <strong>Clé Google Places <small>(optionnelle)</small></strong>
+      <p class="mut" style="margin:6px 0 12px">Pour la source « Google Places ». La clé reste dans ce navigateur. Console Google Cloud → activer « Places API (New) » → créer une clé, la restreindre à cette API et fixer un budget d'alerte.</p>
+      <div class="row">
+        <label>Clé API<input id="gkey" type="password" placeholder="AIza…" autocomplete="off"></label>
+        <button class="sec" id="gkeySave">Enregistrer</button>
+      </div>
+      <p class="mut" id="gkeyMsg" style="margin:8px 0 0"></p>
+    </div>
+    <div class="card">
+      <p class="mut" style="margin:0 0 12px">Efface tous les prospects, statuts, notes et recherches enregistrés dans ce navigateur.</p>
+      <button class="sec danger" id="clear">Tout effacer</button>
+    </div>
+    <p><small>Données © contributeurs OpenStreetMap (licence ODbL), base SIRENE (INSEE, Licence Ouverte) et Google Places si activé. Pour la prospection, respecte le RGPD et les règles de démarchage (droit d'opposition).</small></p>
+  </section>
+
+</div></div>
+
+<div id="drawerBg" class="drawer-bg" hidden></div>
+<div id="drawer" class="drawer" hidden></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const STATUTS = ['À contacter','Contacté','Intéressé','Devis envoyé','Client','Refusé'];
+const SOCIAL_RE = 'facebook|fb[.]com|instagram|linktr[.]ee|tiktok|twitter|x[.]com|youtube|linkedin|planity|doctolib|ubereats|deliveroo|tripadvisor|thefork|pagesjaunes|booksy|treatwell|business[.]site|wixsite|sites[.]google';
+const SOCIAL = new RegExp(SOCIAL_RE, 'i');
+const ENDPOINTS = ['https://overpass-api.de/api/interpreter','https://overpass.private.coffee/api/interpreter','https://overpass.kumi.systems/api/interpreter','https://lz4.overpass-api.de/api/interpreter'];
+const KEY = 'prospecteur_osm';
+
+/* ---------- stockage ---------- */
+let store = {leads:{}, searches:[]};
+try { const s = localStorage.getItem(KEY); if(s) store = JSON.parse(s); } catch(e){}
+store.leads = store.leads||{}; store.searches = store.searches||[]; store.profile = store.profile||{};
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch(e){} };
+const status = t => $('status').textContent = t;
+const LOGS = [];
+function log(msg, level='info'){
+  LOGS.push(`${new Date().toLocaleTimeString('fr-FR')} [${level}] ${msg}`);
+  (level==='error'?console.error:level==='warn'?console.warn:console.log)('[Prospecteur]', msg);
+  const el = $('logbox'); if(el){ el.textContent = LOGS.join('\n'); el.scrollTop = el.scrollHeight; }
+}
+window.addEventListener('error', e => log('Erreur JS : '+e.message+' ('+(e.lineno||'?')+')', 'error'));
+window.addEventListener('unhandledrejection', e => log('Promesse rejetée : '+(e.reason?.message||e.reason), 'error'));
+const esc = s => String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------- navigation ---------- */
+function show(p){
+  ['search','leads','history','logs','settings'].forEach(x=>{ $('p-'+x).hidden = x!==p; });
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on', b.dataset.p===p));
+  if(p==='leads') renderLeads();
+  if(p==='history') renderSearches();
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>show(b.dataset.p));
+$('metier').onchange = () => { $('customWrap').hidden = $('metier').value!=='custom'; };
+
+/* ---------- score ---------- */
+function scoreParts(l){
+  const p = [];
+  if(l.source==='sirene'){
+    const m = monthsSince(l.extra?.creation);
+    p.push(['Site à vérifier (non détectable avec cette source)',20]);
+    p.push([m<=3?'Créée il y a moins de 3 mois':m<=6?'Créée il y a moins de 6 mois':m<=12?'Créée il y a moins de 12 mois':'Créée il y a moins de 24 mois', m<=3?50:m<=6?40:m<=12?30:20]);
+    if(l.adresseComplete) p.push(['Adresse précise',10]);
+  } else {
+    p.push([l.type==='Aucun site' ? 'Aucun site web' : 'Seulement un réseau social / lien tiers', l.type==='Aucun site' ? 45 : 25]);
+    if(l.tel) p.push(['Téléphone renseigné',25]);
+    if(l.horaires) p.push(['Horaires renseignés',10]);
+    if(l.adresseComplete) p.push(['Adresse précise',10]);
+    if(l.email) p.push(['E-mail renseigné',5]);
+    if(l.social) p.push(['Présence sur un réseau social',5]);
+  }
+  const n = +l.noteM||0, a = +l.avisM||0;
+  if(n>=4.5) p.push(['Excellente note Google',15]); else if(n>=4) p.push(['Bonne note Google',10]); else if(n>=3.5) p.push(['Note Google correcte',5]);
+  const ap = Math.min(15, Math.round(Math.log10(a+1)*7)); if(ap>0) p.push(['Volume d\'avis Google',ap]);
+  return p;
+}
+function score(l){ return Math.min(100, scoreParts(l).reduce((s,x)=>s+x[1],0)); }
+const sc_ = l => store.leads[l.id]?.score ?? l.score;
+const badge = s => `<span class="badge ${s>=70?'b-hot':s>=50?'b-warm':''}">${s>=70?'Chaud':s>=50?'Tiède':'Froid'} · ${s}</span>`;
+const statutSelect = (id, cur) => `<select data-id="${esc(id)}" class="st">${STATUTS.map(s=>`<option ${s===cur?'selected':''}>${s}</option>`).join('')}</select>`;
+
+function updateSide(){
+  const L = Object.values(store.leads);
+  $('nLeads').textContent = L.length; $('nSearches').textContent = store.searches.length;
+  $('sHot').textContent = L.filter(l=>l.score>=70).length;
+  $('sTodo').textContent = L.filter(l=>l.statut==='À contacter').length;
+  $('sWon').textContent = L.filter(l=>l.statut==='Client').length;
+  const today = new Date().toISOString().slice(0,10);
+  $('sRel').textContent = L.filter(l=>l.relance && l.relance<=today && !['Client','Refusé'].includes(l.statut)).length;
+  updateBackupUI();
+}
+
+/* ---------- Overpass ---------- */
+/* Géocodage de la ville via Nominatim -> relation OSM (zone exacte) ou bbox */
+async function geocode(ville){
+  const url = `https://nominatim.openstreetmap.org/search?format=json&limit=5&countrycodes=fr&addressdetails=1&extratags=1&q=${encodeURIComponent(ville)}`;
+  log(`Géocodage « ${ville} » → ${url}`);
+  const r = await fetch(url, {headers:{'Accept':'application/json'}});
+  log(`Nominatim : HTTP ${r.status}`);
+  if(!r.ok) throw new Error('Géocodage impossible (HTTP '+r.status+')');
+  const res = await r.json();
+  log(`Nominatim : ${res.length} résultat(s) : ` + res.map(x=>`${x.osm_type}/${x.osm_id} "${x.display_name}"`).join(' | '));
+  if(!res.length) throw new Error(`Ville introuvable : « ${ville} »`);
+  const rel = res.find(x=>x.osm_type==='relation' && x.extratags && x.extratags.admin_level==='8') || res.find(x=>x.osm_type==='relation' && ['city','town','village'].includes(x.addresstype)) || res.find(x=>x.osm_type==='relation' && !/M[ée]tropole/i.test((x.display_name||'').split(',')[1]||'')) || res.find(x=>x.osm_type==='relation');
+  if(rel) return {rel: +rel.osm_id, name: rel.display_name};
+  const b = res[0].boundingbox.map(Number);               // [sud, nord, ouest, est]
+  return {bbox: `${b[0]},${b[2]},${b[1]},${b[3]}`, name: res[0].display_name};
+}
+function buildQuery(tag, geo){
+  const [k,v] = tag.split('=');
+  const scope = geo.rel ? '(area.a)' : `(${geo.bbox})`;
+  const wild = v==='*';
+  const sel = wild ? `["${k}"]` : `["${k}"="${v}"]`;
+  const base = `nwr${scope}${sel}["name"]`;
+  const head = `[out:json][timeout:90];\n${geo.rel ? `area(${3600000000+geo.rel})->.a;\n` : ''}`;
+  if(!wild) return `${head}${base};\nout center tags 5000;`;      // requête légère : filtrage fait dans le navigateur
+  return `${head}(\n  ${base}[!"website"][!"contact:website"][!"url"];\n  ${base}["website"~"${SOCIAL_RE}",i];\n);\nout center tags 5000;`;
+}
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+let cancelled = false, ABORT_ALL = ()=>{};
+async function overpass(query){
+  log('Requête Overpass :\n' + query);
+  const ROUNDS = 3, LIMIT = 60000; cancelled = false;
+  let lastErr = '';
+  for(let round=0; round<ROUNDS; round++){
+    log(`Essai ${round+1}/${ROUNDS} : envoi en parallèle à ${ENDPOINTS.length} serveurs (la première réponse valide est retenue)`);
+    status(`Interrogation de ${ENDPOINTS.length} serveurs en parallèle… (essai ${round+1}/${ROUNDS}, jusqu'à 60 s)`);
+    const ctrls = ENDPOINTS.map(()=>new AbortController());
+    let timedOut = false, finished = false;
+    const timer = setTimeout(()=>{ timedOut = true; ctrls.forEach(c=>c.abort()); }, LIMIT);
+    const t0 = performance.now();
+    const tick = setInterval(()=>status(`Interrogation de ${ENDPOINTS.length} serveurs… ${Math.round((performance.now()-t0)/1000)} s / ${LIMIT/1000} s (essai ${round+1}/${ROUNDS})`), 1000);
+    ABORT_ALL = () => { cancelled = true; clearTimeout(timer); clearInterval(tick); ctrls.forEach(c=>c.abort()); };
+    const tries = ENDPOINTS.map(async (ep,i)=>{
+      const host = ep.replace(/^https?:\/\//,'').split('/')[0];
+      try{
+        const r = await fetch(ep,{method:'POST',signal:ctrls[i].signal,headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'data='+encodeURIComponent(query)});
+        const txt = await r.text();
+        log(`← ${host} : HTTP ${r.status} en ${Math.round(performance.now()-t0)} ms`);
+        if(!r.ok){
+          const msg = `${host} HTTP ${r.status} : ${txt.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').slice(0,160)}`;
+          throw Object.assign(new Error(msg), {fatal: r.status===400});
+        }
+        const data = JSON.parse(txt);
+        if(data.remark) log(`Remarque ${host} : ${data.remark}`, 'warn');
+        if(data.remark && !(data.elements||[]).length) throw new Error(`${host} : ${data.remark}`);
+        return {data, host};
+      }catch(e){
+        if(e.name==='TypeError') e = new Error(`${host} : injoignable ou bloqué (réseau / CORS)`);
+        if(e.name==='AbortError'){ if(timedOut) log(`${host} : pas de réponse en ${LIMIT/1000} s`, 'warn'); throw new Error(`${host} : délai dépassé`); }
+        if(!finished) log(`Échec ${e.message}`, 'error');
+        throw e;
+      }
+    });
+    try{
+      const win = await Promise.any(tries);
+      finished = true; clearTimeout(timer); clearInterval(tick); ctrls.forEach(c=>c.abort());
+      log(`Réponse retenue : ${win.host} (${(win.data.elements||[]).length} éléments)`);
+      return win.data;
+    }catch(agg){
+      clearTimeout(timer); clearInterval(tick);
+      if(cancelled) throw new Error('Recherche annulée');
+      const errs = agg.errors || [agg];
+      const fatal = errs.find(e=>e.fatal); if(fatal) throw fatal;
+      lastErr = errs.map(e=>e.message).join(' | ');
+    }
+    if(round < ROUNDS-1){
+      const wait = 5 * Math.pow(2, round);
+      log(`Aucun serveur n'a répondu correctement. Nouvel essai dans ${wait} s…`, 'warn');
+      for(let s=wait; s>0; s--){ status(`Serveurs OpenStreetMap saturés : nouvel essai dans ${s} s… (essai ${round+2}/${ROUNDS})`); await sleep(1000); if(cancelled) throw new Error('Recherche annulée'); }
+    }
+  }
+  throw new Error('Tous les serveurs Overpass sont saturés ou injoignables. Réessaie dans quelques minutes. ('+lastErr.slice(0,300)+')');
+}
+
+function toLead(el, q, ville, old){
+  const t = el.tags||{};
+  const site = t.website || t['contact:website'] || t.url || '';
+  const tel = t.phone || t['contact:phone'] || t.mobile || t['contact:mobile'] || '';
+  const adr = [[t['addr:housenumber'],t['addr:street']].filter(Boolean).join(' '), [t['addr:postcode'],t['addr:city']||ville].filter(Boolean).join(' ')].filter(Boolean).join(', ');
+  const lat = el.lat ?? el.center?.lat, lon = el.lon ?? el.center?.lon;
+  const fb = t['contact:facebook'] || t.facebook || t['contact:instagram'] || t.instagram || '';
+  const id = el.type[0]+el.id;
+  const lead = {
+    id, nom:t.name, activite:t.cuisine?`${t.cuisine}`:'', adresse:adr||ville, adresseComplete: !!(t['addr:street']),
+    tel, email: t.email||t['contact:email']||'', horaires: !!t.opening_hours, social: !!fb,
+    site: site||fb, type: (!site && !fb) ? 'Aucun site' : 'Réseau social',
+    maps: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(t.name+' '+(adr||ville))}`,
+    verif: `https://www.google.com/search?q=${encodeURIComponent(t.name+' '+ville)}`,
+    statut: old?.statut||'À contacter', memo: old?.memo||'', date: old?.date||new Date().toISOString(),
+    requete: old?.requete||q, nouveau: !old,
+    ville, metierLabel: q.slice(0, q.length-ville.length-1).replace(/^★\s*/,''), tags:t, lat, lon,
+    noteM: old?.noteM||'', avisM: old?.avisM||'', dernier: old?.dernier||'', relance: old?.relance||'',
+    histo: old?.histo||[{d:new Date().toISOString(), t:'Prospect détecté'}]
+  };
+  if(!site && fb) lead.type = 'Réseau social';
+  lead.score = score(lead);
+  return lead;
+}
+
+/* ---------- recherche ---------- */
+let current = [], seenIds = new Set();
+$('go').onclick = async () => {
+  let tag = $('metier').value;
+  if(tag==='custom') tag = $('custom').value.trim();
+  const SRC = $('source').value;
+  if(!tag) return status("Renseigne l'activité.");
+  if(SRC==='osm' && !/^[\w:-]+=([\w:-]+|\*)$/.test(tag)) return status('Tag OSM invalide (format attendu : shop=optician).');
+  const label = $('metier').value==='custom' ? tag : $('metier').selectedOptions[0].textContent;
+  const villes = $('villes').value.split(',').map(s=>s.trim()).filter(Boolean);
+  if(!villes.length) return status('Renseigne au moins une ville.');
+  $('go').disabled = true; $('cancel').hidden = false; current = []; seenIds = new Set(); cancelled = false; ABORT_ALL = ()=>{ cancelled = true; };
+  let analysed = 0;
+  try{
+    if(SRC!=='osm'){ await (SRC==='sirene' ? runSirene : runGoogle)(tag, label, villes); }
+    else for(const v of villes){
+      status(`Recherche « ${label} » à ${v}… (peut prendre jusqu'à une minute)`);
+      log(`=== Recherche : ${label} (${tag}) à ${v} ===`);
+      const geo = await geocode(v);
+      log(`Zone retenue : ${geo.rel?'relation '+geo.rel:'bbox '+geo.bbox} – ${geo.name}`);
+      const data = await overpass(buildQuery(tag, geo));
+      const els = data.elements||[];
+      const q = `${label} ${v}`; const kept0 = current.length;
+      analysed += els.length;
+      for(const el of els){
+        const id = el.type[0]+el.id;
+        if(seenIds.has(id)) continue; seenIds.add(id);
+        const lead = toLead(el, q, v, store.leads[id]);
+        const ws = (el.tags||{}).website || (el.tags||{})['contact:website'] || (el.tags||{}).url || '';
+        if(ws && !SOCIAL.test(ws)) continue;   // a déjà un vrai site : on ignore
+        current.push(lead);
+        const {nouveau, ...toStore} = lead; store.leads[id] = toStore;
+      }
+      log(`Bilan ${v} : ${els.length} fiches reçues, ${current.length-kept0} retenues (sans site ou réseau social seul), ${els.length-(current.length-kept0)} ignorées car déjà un site`);
+      if(!els.length) log('Aucune fiche : essaie une autre activité, ou vérifie la zone ci-dessus.', 'warn');
+      store.searches.unshift({q, tag, source:'osm', metier:$('metier').value, ville:v, date:new Date().toISOString(), analyses:els.length, prospects:current.length-kept0});
+      save(); render(); updateSide();
+    }
+    store.searches = store.searches.slice(0,50); save(); updateSide();
+    status(current.length ? `Terminé : ${current.length} prospects trouvés (enregistrés dans Prospects).` : 'Aucun résultat. Vérifie le nom de la ville ou essaie une autre activité.');
+  }catch(e){
+    log('ERREUR : '+e.message, e.message==='Recherche annulée'?'warn':'error');
+    status(e.message==='Recherche annulée' ? 'Recherche annulée.' : 'Erreur : '+e.message+' (détails dans l\'onglet Logs)');
+  }
+  $('go').disabled = false; $('cancel').hidden = true;
+  render(); try{ renderLeads(); renderSearches(); }catch(_){} updateSide();
+};
+
+$('cancel').onclick = () => { log('Annulation demandée','warn'); ABORT_ALL(); };
+
+function filtered(){
+  const sc = +$('fScore').value||0;
+  return current.filter(l =>
+    sc_(l)>=sc &&
+    (l.type!=='Réseau social' || $('fSocial').checked) &&
+    (!$('fPhone').checked || l.tel) &&
+    (!$('fVus').checked || store.leads[l.id].statut==='À contacter')
+  ).sort((a,b)=>sc_(b)-sc_(a));
+}
+
+function rowHTML(l, mode){
+  const S = store.leads[l.id] || l; const st = S.statut;
+  const contact = `${l.tel?`<a href="tel:${esc(l.tel.replace(/\s/g,''))}">${esc(l.tel)}</a>`:'<span class="mut">pas de téléphone</span>'}${l.email?`<br><small>${esc(l.email)}</small>`:''}<br><small>${esc(l.adresse)}</small>`;
+  const nom = `<button class="linkbtn" data-fiche="${esc(l.id)}">${esc(l.nom)}</button> ${l.nouveau?'<span class="tag new">nouveau</span>':(mode==='res'?'<span class="tag">déjà vu</span>':'')}<br><small>${esc(l.activite)}${l.activite?' · ':''}<a href="${esc(l.maps)}" target="_blank" rel="noopener">Maps</a> · <a href="${esc(l.verif)}" target="_blank" rel="noopener">Vérifier</a>${S.noteM?` · ${esc(S.noteM)} ★ (${esc(S.avisM||0)} avis)`:''}</small>`;
+  if(mode==='res') return `<tr>
+    <td>${badge(S.score)}</td><td>${nom}</td><td>${contact}</td>
+    <td><small>${l.extra?.creation?'Créée le '+new Date(l.extra.creation).toLocaleDateString('fr-FR'):(l.horaires?'Horaires renseignés':'—')}</small></td>
+    <td><span class="tag">${l.type}</span>${l.site?`<br><small>${esc(l.site.slice(0,38))}</small>`:''}</td>
+    <td>${statutSelect(l.id, st)}</td></tr>`;
+  return `<tr>
+    <td>${badge(S.score)}</td><td>${nom}<br><small>${new Date(l.date).toLocaleDateString('fr-FR')} · ${esc(l.requete||'')}</small></td><td>${contact}</td>
+    <td>${statutSelect(l.id, st)}</td>
+    <td><input class="note" data-id="${esc(l.id)}" value="${esc(l.memo||'')}" placeholder="Note…"></td>
+    <td><button class="sec del" data-id="${esc(l.id)}" title="Supprimer">✕</button></td></tr>`;
+}
+
+function render(){
+  const list = filtered();
+  $('res').hidden = !current.length;
+  $('tb').innerHTML = list.length ? list.map(l=>rowHTML(l,'res')).join('') : `<tr><td colspan="6" class="empty">Aucun résultat avec ces filtres.</td></tr>`;
+}
+
+$('hFiltre').innerHTML += STATUTS.map(s=>`<option>${s}</option>`).join('');
+$('hFiltre').onchange = renderLeads;
+function renderLeads(){
+  const f = $('hFiltre').value;
+  const list = Object.values(store.leads).filter(l=>!f||l.statut===f).sort((a,b)=>b.score-a.score);
+  $('htb').innerHTML = list.map(l=>rowHTML(l,'hist')).join('');
+  $('hEmpty').hidden = list.length>0;
+  updateSide();
+}
+function renderSearches(){
+  $('searches').innerHTML = store.searches.length ? store.searches.map((s,i)=>`
+    <div class="hist-item"><span><strong>${esc(s.q)}</strong><br><small>${new Date(s.date).toLocaleString('fr-FR')} · ${s.prospects} prospects sur ${s.analyses} fiches · ${({osm:'OpenStreetMap',sirene:'Base officielle',google:'Google'})[s.source||'osm']}</small></span>
+    <button class="sec rerun" data-i="${i}">Relancer</button></div>`).join('') : '<div class="empty">Aucune recherche pour l\'instant.</div>';
+}
+
+document.addEventListener('change', e=>{
+  if(e.target.classList.contains('st')){
+    const l = store.leads[e.target.dataset.id]; if(!l) return;
+    l.statut = e.target.value; (l.histo=l.histo||[]).push({d:new Date().toISOString(), t:'Statut → '+l.statut}); save();
+    if(!$('drawer').hidden && drawerId===l.id) openFiche(l.id);
+    const c = current.find(x=>x.id===l.id); if(c) c.statut = l.statut;
+    updateSide();
+    if(!$('p-leads').hidden) renderLeads(); else if($('fVus').checked) render();
+  }
+});
+document.addEventListener('input', e=>{
+  if(e.target.classList.contains('note')){ const l = store.leads[e.target.dataset.id]; if(l){ l.memo = e.target.value; save(); } }
+});
+document.addEventListener('click', e=>{
+  const d = e.target.closest('.del'), r = e.target.closest('.rerun');
+  if(d){ delete store.leads[d.dataset.id]; save(); renderLeads(); }
+  if(r){
+    const s = store.searches[+r.dataset.i];
+    if(s.source){ $('source').value = s.source; updateSourceUI(); } if(s.since) $('since').value = s.since;
+    const opt = [...$('metier').options].find(o=>o.value===s.metier);
+    if(opt) $('metier').value = s.metier;
+    $('customWrap').hidden = $('metier').value!=='custom';
+    if($('metier').value==='custom') $('custom').value = s.tag;
+    $('villes').value = s.ville; show('search'); $('go').click();
+  }
+});
+['fScore','fSocial','fPhone','fVus'].forEach(id=>$(id).addEventListener('input', render));
+
+$('clear').onclick = () => {
+  if(confirm('Effacer tous les prospects, statuts, notes et recherches ?')){ store={leads:{},searches:[],profile:store.profile,lastBackup:store.lastBackup}; save(); current=[]; render(); updateSide(); }
+};
+$('csv').onclick = () => {
+  const q = v => '"'+String(v??'').replace(/"/g,'""')+'"';
+  const head = ['Score','Nom','Adresse','Téléphone','Email','Site','Statut','Note perso','Date','Maps','Note Google','Avis Google','Dernier contact','Relance'];
+  const rows = Object.values(store.leads).sort((a,b)=>b.score-a.score).map(l=>[l.score,l.nom,l.adresse,l.tel,l.email,l.site||'Aucun',l.statut,l.memo,new Date(l.date).toLocaleDateString('fr-FR'),l.maps,l.noteM,l.avisM,l.dernier,l.relance].map(q).join(';'));
+  const blob = new Blob(['\ufeff'+[head.map(q).join(';'),...rows].join('\n')],{type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='prospects.csv'; a.click();
+};
+
+$('logCopy').onclick = async () => { try{ await navigator.clipboard.writeText(LOGS.join('\n')); $('logCopy').textContent='Copié ✓'; setTimeout(()=>$('logCopy').textContent='Copier les logs',1500);}catch(e){ log('Copie impossible : '+e.message,'warn'); } };
+$('logClear').onclick = () => { LOGS.length = 0; $('logbox').textContent = ''; };
+
+
+/* ---------- fiche prospect ---------- */
+let drawerId = null;
+const osmUrl = id => { const t = {n:'node',w:'way',r:'relation'}[id[0]]; return t ? `https://www.openstreetmap.org/${t}/${id.slice(1)}` : ''; };
+const fmtD = d => new Date(d).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+const linkify = v => /^https?:\/\//i.test(v) ? `<a href="${esc(v)}" target="_blank" rel="noopener">${esc(v.replace(/^https?:\/\/(www\.)?/,'').slice(0,42))}</a>` : esc(v);
+
+function accroche(l){
+  const P = store.profile||{};
+  const sans = l.type==='Aucun site' ? "n'a pas encore de site internet" : l.type==='À vérifier' ? "n'a, à ma connaissance, pas encore de site internet" : "n'a pour l'instant qu'une page sur les réseaux sociaux, sans site à elle";
+  const intro = l.source==='sirene'
+    ? `Je me permets de vous contacter suite à la création de ${l.nom}, et je vous souhaite beaucoup de réussite pour ce lancement. À ma connaissance, l'entreprise n'a pas encore de site internet.`
+    : `Je me permets de vous contacter car j'ai remarqué que ${l.nom} ${sans}.`;
+  const sign = (P.nom||'[Votre prénom]') + ' – ' + (P.tel||'[Votre numéro]') + (P.email?`\n${P.email}`:'') + (P.site?`\n${P.site}`:'');
+  return `Bonjour,\n\n${intro} Aujourd'hui, la plupart des clients cherchent un professionnel sur Google avant d'appeler : un site simple et rapide vous permettrait d'apparaître dans les recherches${l.ville?' à '+l.ville:''} et de recevoir plus de demandes${(+l.noteM>=4)?", d'autant que vos clients vous notent déjà très bien":''}.\n\nJe crée des sites pour les professionnels locaux, et je peux vous montrer une maquette de votre page d'accueil pour que vous voyiez le résultat. Auriez-vous 10 minutes cette semaine pour en discuter ?\n\nCordialement,\n${sign}`;
+}
+function partsHTML(l){
+  return scoreParts(l).map(([k,v])=>`<div class="pts"><span>${esc(k)}</span><b>+${v}</b></div>`).join('')
+    + `<div class="pts"><span><b>Total</b></span><b>${l.score} / 100</b></div>`;
+}
+function openFiche(id){
+  const l = store.leads[id]; if(!l) return; drawerId = id;
+  const t = l.tags || {};
+  const fb = t['contact:facebook'] || t.facebook || '', ig = t['contact:instagram'] || t.instagram || '';
+  const none = '<span class="mut">non renseigné</span>';
+  const site = t.website || t['contact:website'] || t.url || '';
+  const q = encodeURIComponent((l.nom||'')+' '+(l.ville||''));
+  const FORMES = {'1000':'Entrepreneur individuel','5499':'SARL','5498':'EURL','5710':'SAS','5720':'SASU','5599':'SA','9220':'Association'};
+  const ex = l.extra ? `<div class="sec-t">Entreprise (base officielle)</div><div class="kv"><span>SIREN</span><span><a href="https://annuaire-entreprises.data.gouv.fr/entreprise/${esc(l.extra.siren)}" target="_blank" rel="noopener">${esc(l.extra.siren)}</a></span><span>Création</span><span>${l.extra.creation?new Date(l.extra.creation).toLocaleDateString('fr-FR'):'—'}</span><span>Activité (NAF)</span><span>${esc(l.extra.naf||'—')}</span><span>Forme</span><span>${esc(FORMES[l.extra.forme]||l.extra.forme||'—')}</span></div>` : '';
+  $('drawer').innerHTML = `
+    <div style="display:flex;justify-content:space-between;gap:10px;align-items:start">
+      <div><h2>${esc(l.nom)}</h2><small>${esc(l.metierLabel||l.activite||'')}${l.ville?' · '+esc(l.ville):''}</small></div>
+      <button class="sec" id="dClose" title="Fermer (Échap)">✕</button>
+    </div>
+    <div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span id="dScore">${badge(l.score)}</span>${statutSelect(l.id, l.statut)}</div>
+
+    <div class="sec-t">Coordonnées</div>
+    <div class="kv">
+      <span>Téléphone</span><span>${l.tel?`<a href="tel:${esc(l.tel.replace(/\s/g,''))}">${esc(l.tel)}</a>`:none}</span>
+      <span>E-mail</span><span>${l.email?`<a href="mailto:${esc(l.email)}">${esc(l.email)}</a>`:none}</span>
+      <span>Adresse</span><span>${esc(l.adresse)||none}</span>
+      <span>Horaires</span><span>${t.opening_hours?esc(fmtHours(t.opening_hours).join(' · ')):none}</span>
+      ${t.description?`<span>Description</span><span>${esc(t.description)}</span>`:''}
+      ${t.cuisine?`<span>Cuisine</span><span>${esc(t.cuisine)}</span>`:''}
+      ${t.operator||t.brand?`<span>Enseigne</span><span>${esc(t.operator||t.brand)}</span>`:''}
+      ${t.start_date?`<span>Ouverture</span><span>${esc(t.start_date)}</span>`:''}
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+      <a class="btnl" href="${esc(l.maps)}" target="_blank" rel="noopener">Google Maps</a>
+      <a class="btnl" href="https://www.google.com/search?q=${q}" target="_blank" rel="noopener">Vérifier sur Google</a>
+      ${osmUrl(l.id)?`<a class="btnl" href="${osmUrl(l.id)}" target="_blank" rel="noopener">Fiche OpenStreetMap</a>`:''}
+    </div>
+
+    ${ex}
+    <div class="sec-t">Présence en ligne</div>
+    <div class="kv">
+      <span>Statut</span><span>${l.type==='Aucun site'?'<b>Aucun site web</b>':l.type==='À vérifier'?'<b>À vérifier</b> : cette source ne dit pas si un site existe':'Seulement un réseau social / lien tiers'}</span>
+      <span>Site</span><span>${site?linkify(site):none}</span>
+      <span>Facebook</span><span>${fb?linkify(fb):none}</span>
+      <span>Instagram</span><span>${ig?linkify(ig):none}</span>
+    </div>
+
+    <div class="sec-t">Réputation Google</div>
+    <div class="two">
+      <label>Note (sur 5)<input type="number" min="0" max="5" step="0.1" data-f="noteM" data-id="${esc(l.id)}" value="${esc(l.noteM||'')}" placeholder="ex : 4.6"></label>
+      <label>Nombre d'avis<input type="number" min="0" data-f="avisM" data-id="${esc(l.id)}" value="${esc(l.avisM||'')}" placeholder="ex : 38"></label>
+    </div>
+    <p style="margin:8px 0 0"><small>Rempli automatiquement avec la source Google. Sinon, clique sur « Vérifier sur Google », relève la note et le nombre d'avis, puis reporte-les ici : le score se met à jour.</small></p>
+
+    <div class="sec-t">Détail du score</div>
+    <div id="dParts">${partsHTML(l)}</div>
+
+    <div class="sec-t">Suivi commercial</div>
+    <div class="two">
+      <label>Dernier contact<input type="date" data-f="dernier" data-id="${esc(l.id)}" value="${esc(l.dernier||'')}"></label>
+      <label>Relancer le<input type="date" data-f="relance" data-id="${esc(l.id)}" value="${esc(l.relance||'')}"></label>
+    </div>
+    <label style="margin-top:10px">Notes<textarea data-f="memo" data-id="${esc(l.id)}" placeholder="Ce qui a été dit, objections, budget…">${esc(l.memo||'')}</textarea></label>
+
+    <div class="sec-t">Message d'accroche</div>
+    <textarea id="dMsg" style="min-height:210px">${esc(accroche(l))}</textarea>
+    <button class="sec" id="dCopy">Copier le message</button>
+
+    <div class="sec-t">Maquette de site</div>
+    <p style="margin:0 0 10px"><small>Génère une page d'accueil de démonstration à partir de la fiche (nom, adresse, téléphone, horaires, note saisie). Les textes sont génériques, à personnaliser.</small></p>
+    <div class="row">
+      <label style="flex:0 0 180px">Style<select id="dTheme"><option value="moderne">Moderne (clair)</option><option value="elegant">Élégant (sombre)</option><option value="chaleureux">Chaleureux (crème)</option></select></label>
+      <button class="sec" id="dPrev">Prévisualiser</button>
+      <button class="sec" id="dDlSite">Télécharger .html</button>
+    </div>
+
+    <div class="sec-t">Historique</div>
+    ${(l.histo||[]).slice().reverse().map(x=>`<div class="tl">${fmtD(x.d)} · ${esc(x.t)}</div>`).join('') || '<div class="tl">—</div>'}
+
+    <details><summary>Données brutes OpenStreetMap</summary><pre>${l.tags?esc(JSON.stringify(l.tags,null,2)):'Non disponibles pour ce prospect (relance la recherche pour les récupérer).'}</pre></details>
+    <div style="margin-top:22px"><button class="sec danger" id="dDel">Supprimer ce prospect</button></div>`;
+  $('drawer').hidden = false; $('drawerBg').hidden = false;
+}
+function closeFiche(){
+  $('drawer').hidden = true; $('drawerBg').hidden = true; drawerId = null;
+  render(); if(!$('p-leads').hidden) renderLeads(); updateSide();
+}
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && !$('drawer').hidden) closeFiche(); });
+$('drawerBg').onclick = closeFiche;
+document.addEventListener('input', e=>{
+  const f = e.target.dataset?.f; if(!f) return;
+  const l = store.leads[e.target.dataset.id]; if(!l) return;
+  l[f] = e.target.value;
+  if(f==='noteM' || f==='avisM'){
+    l.score = score(l);
+    if($('dScore')) $('dScore').innerHTML = badge(l.score);
+    if($('dParts')) $('dParts').innerHTML = partsHTML(l);
+  }
+  if(f==='dernier') (l.histo=l.histo||[]).push({d:new Date().toISOString(), t:'Dernier contact daté du '+(l.dernier||'—')});
+  save(); updateSide();
+});
+document.addEventListener('click', e=>{
+  const fc = e.target.closest('[data-fiche]'); if(fc){ openFiche(fc.dataset.fiche); return; }
+  if(e.target.closest('#dClose')) closeFiche();
+  if(e.target.closest('#dCopy')){
+    const l = store.leads[drawerId]; if(!l) return;
+    navigator.clipboard.writeText($('dMsg') ? $('dMsg').value : accroche(l)).then(()=>{ $('dCopy').textContent='Copié ✓'; setTimeout(()=>{ if($('dCopy')) $('dCopy').textContent='Copier le message'; },1500); }).catch(()=>log('Copie impossible','warn'));
+  }
+  if(e.target.closest('#dDel')){
+    if(confirm('Supprimer ce prospect ?')){ delete store.leads[drawerId]; save(); closeFiche(); }
+  }
+});
+
+/* ---------- sauvegarde / profil / clé Google ---------- */
+function backupAge(){ if(!store.lastBackup) return null; return Math.floor((Date.now()-new Date(store.lastBackup))/86400000); }
+function updateBackupUI(){
+  const n = Object.keys(store.leads).length, age = backupAge();
+  $('sBk').textContent = age===null ? 'jamais' : age===0 ? "aujourd'hui" : `il y a ${age} j`;
+  $('bkWarn').hidden = !(n>0 && (age===null || age>=7));
+  $('bkWarnTxt').textContent = age===null ? `Tu as ${n} prospect(s) mais aucune sauvegarde.` : `Dernière sauvegarde il y a ${age} jours.`;
+}
+function exportBackup(){
+  const data = {app:'prospecteur', version:1, exported:new Date().toISOString(), leads:store.leads, searches:store.searches, profile:store.profile};
+  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `prospecteur-sauvegarde-${new Date().toISOString().slice(0,10)}.json`; a.click();
+  store.lastBackup = new Date().toISOString(); save(); updateBackupUI();
+  $('bkMsg').textContent = `Sauvegarde exportée : ${Object.keys(store.leads).length} prospect(s), ${store.searches.length} recherche(s).`;
+  log('Sauvegarde exportée');
+}
+function importBackup(file){
+  const rd = new FileReader();
+  rd.onerror = () => { $('bkMsg').textContent = 'Lecture du fichier impossible.'; };
+  rd.onload = () => {
+    try{
+      const d = JSON.parse(rd.result);
+      if(!d || d.app!=='prospecteur' || typeof d.leads!=='object') throw new Error("ce n'est pas une sauvegarde Prospecteur.");
+      const mode = $('bkMode').value;
+      if(mode==='replace' && !confirm('Remplacer toutes les données actuelles par cette sauvegarde ?')) return;
+      let added = 0, updated = 0;
+      if(mode==='replace'){
+        store.leads = d.leads||{}; store.searches = d.searches||[]; added = Object.keys(store.leads).length;
+      } else {
+        for(const [id,l] of Object.entries(d.leads||{})){
+          const cur = store.leads[id];
+          if(!cur){ store.leads[id] = l; added++; }
+          else if((l.histo||[]).length > (cur.histo||[]).length){ store.leads[id] = l; updated++; }
+        }
+        const seen = new Set(store.searches.map(s=>s.q+s.date));
+        for(const s of (d.searches||[])) if(!seen.has(s.q+s.date)) store.searches.push(s);
+        store.searches.sort((a,b)=>String(b.date).localeCompare(String(a.date))); store.searches = store.searches.slice(0,50);
+      }
+      if(d.profile && !Object.values(store.profile).some(Boolean)) store.profile = d.profile;
+      store.lastBackup = d.exported || store.lastBackup;
+      save(); fillProfile(); render(); renderLeads(); renderSearches(); updateSide();
+      $('bkMsg').textContent = mode==='replace' ? `Import terminé : ${added} prospect(s).` : `Import terminé : ${added} ajouté(s), ${updated} mis à jour.`;
+      log('Sauvegarde importée ('+mode+')');
+    }catch(e){ $('bkMsg').textContent = 'Import impossible : '+e.message; log('Import impossible : '+e.message,'error'); }
+  };
+  rd.readAsText(file);
+}
+$('bkExport').onclick = exportBackup;
+$('bkNow').onclick = exportBackup;
+$('bkImportBtn').onclick = () => $('bkFile').click();
+$('bkFile').onchange = e => { const f = e.target.files[0]; if(f) importBackup(f); e.target.value = ''; };
+
+function fillProfile(){ document.querySelectorAll('[data-pf]').forEach(i=>{ i.value = store.profile[i.dataset.pf]||''; }); }
+document.addEventListener('input', e=>{ const k = e.target.dataset?.pf; if(k){ store.profile[k] = e.target.value; save(); } });
+fillProfile();
+
+try{ $('gkey').value = localStorage.getItem('gkey')||''; }catch(e){}
+$('gkeySave').onclick = () => { try{ localStorage.setItem('gkey',$('gkey').value.trim()); $('gkeyMsg').textContent = 'Clé enregistrée dans ce navigateur.'; }catch(e){ $('gkeyMsg').textContent = "Impossible d'enregistrer la clé."; } };
+
+/* ---------- maquette de site ---------- */
+const THEMES = {
+  moderne:{bg:'#ffffff',fg:'#16201c',mut:'#5b6b64',card:'#f1f6f4',ac:'#0f766e',acfg:'#ffffff',hero:'linear-gradient(135deg,#e3f3ef,#ffffff)',hfont:'system-ui,-apple-system,Segoe UI,sans-serif'},
+  elegant:{bg:'#111110',fg:'#f1ece2',mut:'#a69f91',card:'#1b1a18',ac:'#c9a24b',acfg:'#111110',hero:'linear-gradient(135deg,#1e1c17,#111110)',hfont:'Georgia,"Times New Roman",serif'},
+  chaleureux:{bg:'#fbf6ee',fg:'#2b2118',mut:'#7a6a59',card:'#f3e9da',ac:'#b4532a',acfg:'#ffffff',hero:'linear-gradient(135deg,#f6e7d2,#fbf6ee)',hfont:'Georgia,"Times New Roman",serif'}
+};
+const SERV = {
+  'shop=hairdresser':['Salon de coiffure',[['Coupe','Femme, homme et enfant'],['Couleur','Coloration, mèches, balayage'],['Coiffage','Brushing, chignons, occasions spéciales'],['Soins','Soins du cheveu et du cuir chevelu']]],
+  'shop=beauty':['Institut de beauté',[['Soins du visage','Nettoyage, hydratation, anti-âge'],['Épilation','Techniques douces et soignées'],['Manucure','Mains et ongles'],['Massages','Détente et bien-être']]],
+  'amenity=restaurant':['Restaurant',[['La carte','Une cuisine faite maison'],['Plat du jour','Renouvelé chaque jour'],['Menus','Midi et soir'],['Privatisation','Repas de groupe et événements']]],
+  'amenity=cafe':['Café',[['Boissons','Cafés, thés, boissons fraîches'],['Petite restauration','Sandwichs, salades, pâtisseries'],['Brunch','Le week-end'],['Terrasse','Aux beaux jours']]],
+  'amenity=bar':['Bar',[['Cocktails','Classiques et créations'],['Bières & vins','Une sélection soignée'],['Soirées','Concerts et événements'],['Privatisation','Anniversaires et groupes']]],
+  'shop=bakery':['Boulangerie-pâtisserie',[['Pains','Tradition, céréales, spéciaux'],['Viennoiseries','Fabriquées chaque matin'],['Pâtisseries','Gâteaux et entremets'],['Sandwichs','Formules midi']]],
+  'shop=butcher':['Boucherie',[['Viandes','Bœuf, porc, volaille, agneau'],['Charcuterie','Maison et artisanale'],['Traiteur','Plats préparés'],['Commandes','Pour vos repas de fête']]],
+  'shop=florist':['Fleuriste',[['Bouquets','Du quotidien aux grandes occasions'],['Plantes','Intérieur et extérieur'],['Mariages & deuil','Compositions sur mesure'],['Livraison','À domicile et en entreprise']]],
+  'shop=car_repair':['Garage automobile',[['Entretien','Vidange, freins, pneus'],['Réparation','Mécanique et électricité'],['Contrôle','Préparation au contrôle technique'],['Devis','Clairs et sans surprise']]],
+  'craft=plumber':['Plomberie',[['Dépannage','Fuites, canalisations, urgences'],['Installation','Sanitaires, chauffe-eau'],['Rénovation','Salle de bain et cuisine'],['Devis','Gratuit et détaillé']]],
+  'craft=electrician':['Électricité',[['Dépannage','Pannes et urgences'],['Installation','Neuf et rénovation'],['Mise aux normes','Tableaux et sécurité'],['Domotique','Éclairage et volets connectés']]],
+  'craft=carpenter':['Menuiserie',[['Sur mesure','Placards, escaliers, meubles'],['Fenêtres & portes','Pose et rénovation'],['Parquet','Pose et ponçage'],['Devis','Gratuit et détaillé']]],
+  'craft=painter':['Peinture en bâtiment',[['Intérieur','Murs, plafonds, boiseries'],['Façades','Ravalement et protection'],['Revêtements','Papier peint, enduits'],['Devis','Gratuit et détaillé']]],
+  'craft=hvac':['Chauffage & climatisation',[['Installation','Chaudières, pompes à chaleur'],['Entretien','Contrats annuels'],['Dépannage','Intervention rapide'],['Climatisation','Pose et maintenance']]],
+  'craft=gardener':['Paysagiste',[['Entretien','Tonte, taille, désherbage'],['Création','Jardins et terrasses'],['Plantations','Haies, arbres, massifs'],['Arrosage','Installation automatique']]],
+  'craft=photographer':['Photographe',[['Portraits','Individuels et famille'],['Mariages','Reportage et souvenirs'],['Entreprises','Corporate et produits'],['Événements','Couverture sur mesure']]],
+  'shop=clothes':['Boutique de mode',[['Nouveautés','Collections de la saison'],['Accessoires','Pour compléter vos tenues'],['Conseils','Un accueil personnalisé'],['Cartes cadeaux','Pour faire plaisir']]],
+  'shop=tattoo':['Studio de tatouage',[['Création','Dessins personnalisés'],['Tatouage','Hygiène et sécurité'],['Retouches','Remise en état de vos tatouages'],['Rendez-vous','Sur réservation']]],
+  'leisure=fitness_centre':['Salle de sport',[['Musculation','Espace équipé'],['Cours collectifs','Planning varié'],['Coaching','Programmes personnalisés'],['Abonnements','Souples et sans engagement']]],
+  'amenity=dentist':['Cabinet dentaire',[['Soins','Caries, détartrage, prévention'],['Esthétique','Blanchiment, facettes'],['Prothèses','Couronnes, bridges'],['Urgences','Prise en charge rapide']]],
+  'default':['Nos services',[['Prestation 1','Décrivez ici votre premier service'],['Prestation 2','Décrivez ici votre deuxième service'],['Prestation 3','Décrivez ici votre troisième service']]]
+};
+function catOf(l){
+  if(l.cat && SERV[l.cat]) return l.cat;
+  const t = l.tags||{};
+  for(const k of ['shop','craft','amenity','leisure']) if(t[k] && SERV[`${k}=${t[k]}`]) return `${k}=${t[k]}`;
+  return 'default';
+}
+function fmtHours(s){
+  if(!s) return [];
+  const D = {Mo:'Lun',Tu:'Mar',We:'Mer',Th:'Jeu',Fr:'Ven',Sa:'Sam',Su:'Dim',PH:'Jours fériés'};
+  return String(s).split(';').map(x=>x.trim()).filter(Boolean).map(x=>x.replace(/\b(Mo|Tu|We|Th|Fr|Sa|Su|PH)\b/g,m=>D[m]).replace(/\boff\b/gi,'fermé'));
+}
+function buildDemoSite(l, themeKey){
+  const T = THEMES[themeKey] || THEMES.moderne, P = store.profile||{}, t = l.tags||{};
+  const sv = SERV[catOf(l)];
+  const nom = l.nom||'Votre entreprise', ville = l.ville||'';
+  const hours = fmtHours(t.opening_hours);
+  const q = encodeURIComponent(`${nom} ${l.adresse||ville}`);
+  const fb = t['contact:facebook'] || t.facebook || '', ig = t['contact:instagram'] || t.instagram || '';
+  const rating = (+l.noteM>0) ? `<p class="rate">★ ${esc(String(l.noteM).replace('.',','))}/5 sur Google${+l.avisM>0?` · ${esc(l.avisM)} avis`:''}</p>` : '';
+  const ribbon = `Maquette de démonstration${P.nom?' réalisée par '+esc(P.nom):''}${P.tel?' · '+esc(P.tel):''}${P.email?' · '+esc(P.email):''} — textes et images à personnaliser`;
+  const desc = `${sv[0]}${ville?' à '+ville:''} – ${nom}`;
+  return `<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${esc(nom)}${ville?' – '+esc(ville):''}</title>
+<meta name="description" content="${esc(desc)}">
+<style>
+:root{--bg:${T.bg};--fg:${T.fg};--mut:${T.mut};--card:${T.card};--ac:${T.ac};--acfg:${T.acfg}}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 system-ui,-apple-system,Segoe UI,sans-serif}
+h1,h2,h3{font-family:${T.hfont};line-height:1.2;margin:0}
+.ribbon{background:#111;color:#fff;text-align:center;font:12.5px/1.4 system-ui,sans-serif;padding:8px 14px}
+nav{display:flex;justify-content:space-between;align-items:center;gap:12px;max-width:1040px;margin:auto;padding:16px 20px}
+nav b{font:700 18px ${T.hfont}}nav a{color:var(--fg);text-decoration:none;margin-left:18px;font-size:14px}
+.hero{background:${T.hero};padding:84px 20px 76px;text-align:center}
+.hero h1{font-size:clamp(32px,6vw,56px);margin-bottom:12px}
+.hero p{max-width:560px;margin:0 auto 22px;color:var(--mut);font-size:18px}
+.btn{display:inline-block;background:var(--ac);color:var(--acfg);padding:13px 24px;border-radius:999px;text-decoration:none;font-weight:600;margin:5px}
+.btn.o{background:transparent;color:var(--fg);border:1.5px solid var(--ac)}
+section{max-width:1040px;margin:auto;padding:56px 20px}
+h2{font-size:30px;margin-bottom:22px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.card{background:var(--card);border-radius:14px;padding:22px}
+.card h3{font-size:19px;margin-bottom:6px}.card p{margin:0;color:var(--mut);font-size:15px}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:28px;align-items:start}
+ul{list-style:none;margin:0;padding:0}li{padding:7px 0;border-bottom:1px solid rgba(128,128,128,.25)}
+iframe{width:100%;height:320px;border:0;border-radius:14px}
+.rate{color:var(--ac);font-weight:600;margin:0 0 16px}
+footer{text-align:center;color:var(--mut);font-size:13px;padding:30px 20px 44px}
+a{color:var(--ac)}
+@media(max-width:560px){nav a{display:none}}
+</style></head><body>
+<div class="ribbon">${ribbon}</div>
+<nav><b>${esc(nom)}</b><div><a href="#services">Prestations</a><a href="#infos">Infos pratiques</a><a href="#contact">Contact</a></div></nav>
+<header class="hero"><h1>${esc(nom)}</h1><p>${esc(sv[0])}${ville?' à '+esc(ville):''}</p>${rating}
+${l.tel?`<a class="btn" href="tel:${esc(l.tel.replace(/\s/g,''))}">Appeler ${esc(l.tel)}</a>`:''}<a class="btn o" href="#contact">Nous trouver</a></header>
+<section id="services"><h2>${esc(sv[0])}</h2><div class="grid">${sv[1].map(([a,b])=>`<div class="card"><h3>${esc(a)}</h3><p>${esc(b)}</p></div>`).join('')}</div></section>
+<section><h2>À propos</h2><p style="max-width:680px;color:var(--mut)">${esc(nom)} vous accueille${ville?' à '+esc(ville):''}. Présentez ici votre histoire, votre équipe et ce qui vous distingue.</p></section>
+<section id="infos"><div class="two">
+<div><h2>Horaires</h2>${hours.length?`<ul>${hours.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:'<p style="color:var(--mut)">Horaires à compléter.</p>'}</div>
+<div><h2>Contact</h2><ul>
+${l.adresse?`<li>${esc(l.adresse)}</li>`:''}
+${l.tel?`<li><a href="tel:${esc(l.tel.replace(/\s/g,''))}">${esc(l.tel)}</a></li>`:''}
+${l.email?`<li><a href="mailto:${esc(l.email)}">${esc(l.email)}</a></li>`:''}
+${fb?`<li><a href="${esc(fb)}">Facebook</a></li>`:''}${ig?`<li><a href="${esc(ig)}">Instagram</a></li>`:''}
+</ul></div></div></section>
+<section id="contact"><h2>Nous trouver</h2><iframe loading="lazy" src="https://www.google.com/maps?q=${q}&output=embed" title="Carte"></iframe></section>
+<footer>© ${new Date().getFullYear()} ${esc(nom)}</footer>
+</body></html>`;
+}
+document.addEventListener('click', e=>{
+  const pv = e.target.closest('#dPrev'), dl = e.target.closest('#dDlSite');
+  if(!pv && !dl) return;
+  const l = store.leads[drawerId]; if(!l) return;
+  const theme = $('dTheme').value;
+  const html = buildDemoSite(l, theme);
+  (l.histo = l.histo||[]).push({d:new Date().toISOString(), t:'Maquette de site générée ('+theme+')'}); save();
+  const url = URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'}));
+  if(pv){ window.open(url,'_blank'); }
+  else {
+    const slug = String(l.nom||'site').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'site';
+    const a = document.createElement('a'); a.href = url; a.download = `maquette-${slug}.html`; a.click();
+  }
+  log('Maquette générée pour '+l.nom+' ('+theme+')');
+});
+
+/* ---------- sources : base officielle (SIRENE) + Google Places ---------- */
+const SRC_INFO = {
+  osm: $('srcInfo').innerHTML,
+  sirene: "<b>Base officielle des entreprises (SIRENE)</b> : liste les entreprises <b>créées récemment</b> dans la ville. Ce sont d'excellents prospects, car elles n'ont presque jamais de site. Cette source <b>ne dit pas</b> si l'entreprise a déjà un site et ne donne pas de téléphone : utilise « Vérifier sur Google » sur la fiche.",
+  google: "<b>Google Places</b> : notes, avis, téléphones et horaires fiables, remplis automatiquement. Nécessite une clé API (Données → Clé Google Places). Payant au-delà du quota gratuit mensuel ; 3 pages (≈ 60 fiches) par recherche."
+};
+function updateSourceUI(){
+  const s = $('source').value;
+  $('sinceWrap').hidden = s!=='sirene';
+  $('srcInfo').innerHTML = SRC_INFO[s];
+  $('customLbl').textContent = {osm:'Tag OSM (clé=valeur)', sirene:'Code NAF (ex : 96.02A)', google:'Mot-clé (ex : opticien)'}[s];
+  $('custom').placeholder = {osm:'shop=optician', sirene:'96.02A', google:'opticien'}[s];
+  if(s==='sirene') $('fPhone').checked = false;
+}
+$('source').onchange = updateSourceUI;
+updateSourceUI();
+
+const NAF = {'shop=hairdresser':'96.02A','shop=beauty':'96.02B','amenity=restaurant':'56.10A,56.10C','amenity=cafe':'56.30Z','amenity=bar':'56.30Z','shop=bakery':'10.71C,10.71D','shop=butcher':'47.22Z','shop=florist':'47.76Z','shop=car_repair':'45.20A,45.20B','craft=plumber':'43.22A','craft=electrician':'43.21A','craft=carpenter':'43.32A','craft=painter':'43.34Z','craft=hvac':'43.22B','craft=gardener':'81.30Z','craft=photographer':'74.20Z','shop=clothes':'47.71Z','shop=tattoo':'96.09Z','leisure=fitness_centre':'93.13Z','amenity=dentist':'86.23Z'};
+const ARR = ['69123','75056','13055'];   // Lyon, Paris, Marseille : les établissements sont rattachés aux arrondissements -> filtre par code postal
+const monthsSince = d => (Date.now() - new Date(d)) / (30.44*86400000);
+const carry = (old, q) => ({
+  statut: old?.statut||'À contacter', memo: old?.memo||'', date: old?.date||new Date().toISOString(), requete: old?.requete||q, nouveau: !old,
+  noteM: old?.noteM||'', avisM: old?.avisM||'', dernier: old?.dernier||'', relance: old?.relance||'',
+  histo: old?.histo||[{d:new Date().toISOString(), t:'Prospect détecté'}]
+});
+function addLead(lead){
+  if(seenIds.has(lead.id)) return false;
+  seenIds.add(lead.id); current.push(lead);
+  const {nouveau, ...rest} = lead; store.leads[lead.id] = rest;
+  return true;
+}
+
+/* ----- base officielle ----- */
+async function findCommune(v){
+  const byCp = /^\d{5}$/.test(v);
+  const url = `https://geo.api.gouv.fr/communes?${byCp?'codePostal='+v:'nom='+encodeURIComponent(v)}&fields=nom,code,codesPostaux,population&boost=population&limit=3`;
+  log('Commune : '+url);
+  let r; try{ r = await fetch(url); }catch(e){ throw new Error('geo.api.gouv.fr injoignable (réseau / CORS) : '+e.message); }
+  if(!r.ok) throw new Error('Recherche de commune : HTTP '+r.status);
+  const a = await r.json();
+  log('Communes trouvées : '+a.map(c=>`${c.nom} (${c.code})`).join(', '));
+  if(!a.length) throw new Error(`Commune introuvable : « ${v} »`);
+  return a[0];
+}
+async function sFetch(params, st, qfall){
+  for(let attempt=0; attempt<4; attempt++){
+    const pr = new URLSearchParams(params); if(st.useQ) pr.set('q', qfall);
+    const url = 'https://recherche-entreprises.api.gouv.fr/search?'+pr;
+    if(params.page==='1' && attempt===0) log('Base officielle : '+url);
+    let r; try{ r = await fetch(url,{headers:{Accept:'application/json'}}); }catch(e){ throw new Error('Base officielle injoignable (réseau / CORS) : '+e.message); }
+    if(r.status===429){ log('Limite de débit atteinte, pause…','warn'); await sleep(1500*(attempt+1)); continue; }
+    if((r.status===400 || r.status===422) && !st.useQ){ log(`HTTP ${r.status} sans paramètre q : nouvel essai avec q=${qfall}`,'warn'); st.useQ = true; continue; }
+    if(!r.ok) throw new Error('Base officielle : HTTP '+r.status);
+    return await r.json();
+  }
+  throw new Error('Base officielle : trop de tentatives (limite de débit)');
+}
+async function runSirene(tag, label, villes){
+  const custom = $('metier').value==='custom';
+  const naf = custom ? tag.toUpperCase().replace(/\s/g,'') : NAF[tag];
+  if(!naf || !/^\d{2}\.\d{2}[A-Z](,\d{2}\.\d{2}[A-Z])*$/.test(naf)) throw new Error("Cette activité n'a pas de code NAF associé. Choisis une activité de la liste, ou « Autre » avec un code NAF (ex : 96.02A).");
+  const since = +$('since').value || 12;
+  for(const v of villes){
+    if(cancelled) throw new Error('Recherche annulée');
+    log(`=== Base officielle : ${label} (NAF ${naf}) à ${v}, créées depuis ${since} mois max ===`);
+    status(`Recherche de la commune « ${v} »…`);
+    const com = await findCommune(v);
+    const q = `${label} ${v}`, kept0 = current.length;
+    const base = {activite_principale:naf, etat_administratif:'A', per_page:'25'};
+    if(ARR.includes(com.code)) base.code_postal = (com.codesPostaux||[]).join(','); else base.code_commune = com.code;
+    const st = {useQ:false}; let page = 1, total = 1, analysed = 0;
+    while(page <= Math.min(total, 80)){
+      if(cancelled) throw new Error('Recherche annulée');
+      status(`Base officielle : ${label} à ${com.nom} – page ${page}/${Math.min(total,80)}… ${current.length-kept0} entreprise(s) récente(s)`);
+      const j = await sFetch({...base, page:String(page)}, st, com.nom);
+      total = j.total_pages || 1;
+      if(page===1) log(`Base officielle : ${j.total_results ?? '?'} entreprises actives (${total} page(s))`);
+      for(const r of (j.results||j.resultats||[])){
+        analysed++;
+        const sg = r.siege||{};
+        const created = r.date_creation || sg.date_creation;
+        const nom = r.nom_complet || r.nom_raison_sociale;
+        if(!created || !nom || /^\[?ND\]?$/i.test(nom.trim())) continue;
+        const m = monthsSince(created); if(m<0 || m>since) continue;
+        if(sg.code_postal && (com.codesPostaux||[]).length && !com.codesPostaux.includes(sg.code_postal)) continue;
+        const id = 's:'+r.siren, old = store.leads[id];
+        const adr = sg.adresse || [sg.code_postal, sg.libelle_commune||sg.commune].filter(Boolean).join(' ');
+        const lead = {...carry(old,q), id, nom, activite:'', adresse:adr||com.nom, adresseComplete:!!sg.adresse, tel:'', email:'', horaires:false, social:false, site:'', type:'À vérifier',
+          source:'sirene', cat: custom?'':tag, ville:com.nom, metierLabel:label.replace(/^★\s*/,''), tags:{}, lat:sg.latitude, lon:sg.longitude,
+          maps:`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(nom+' '+(adr||com.nom))}`,
+          verif:`https://www.google.com/search?q=${encodeURIComponent(nom+' '+com.nom)}`,
+          extra:{siren:r.siren, creation:created, naf:r.activite_principale||naf, forme:r.nature_juridique, effectif:r.tranche_effectif_salarie}};
+        lead.score = score(lead); addLead(lead);
+      }
+      render(); page++; await sleep(160);
+    }
+    if(total > 80) log(`Seules les 80 premières pages (2000 entreprises) sur ${total} ont été analysées.`,'warn');
+    log(`Bilan ${com.nom} : ${analysed} entreprises analysées, ${current.length-kept0} créées depuis ${since} mois max`);
+    store.searches.unshift({q, tag, source:'sirene', since, metier:$('metier').value, ville:v, date:new Date().toISOString(), analyses:analysed, prospects:current.length-kept0});
+    save(); updateSide();
+  }
+}
+
+/* ----- Google Places ----- */
+const G_MASK = ['places.id','places.displayName','places.primaryTypeDisplayName','places.formattedAddress','places.nationalPhoneNumber','places.websiteUri','places.googleMapsUri','places.rating','places.userRatingCount','places.businessStatus','places.regularOpeningHours','nextPageToken'].join(',');
+async function gFetch(q, key, token){
+  const body = {textQuery:q, languageCode:'fr', regionCode:'FR', pageSize:20}; if(token) body.pageToken = token;
+  log(`Google Places : « ${q} »${token?' (page suivante)':''}`);
+  let r; try{
+    r = await fetch('https://places.googleapis.com/v1/places:searchText',{method:'POST',headers:{'Content-Type':'application/json','X-Goog-Api-Key':key,'X-Goog-FieldMask':G_MASK},body:JSON.stringify(body)});
+  }catch(e){ throw new Error('Google Places injoignable (réseau / CORS) : '+e.message); }
+  const j = await r.json().catch(()=>({}));
+  log(`← Google : HTTP ${r.status}`);
+  if(!r.ok) throw new Error('Google : '+(j.error?.message || ('HTTP '+r.status)));
+  return j;
+}
+async function runGoogle(tag, label, villes){
+  let key = ''; try{ key = (localStorage.getItem('gkey')||'').trim(); }catch(e){}
+  if(!key) throw new Error('Clé Google manquante : ajoute-la dans Données → Clé Google Places.');
+  const WILD = {'craft=*':'artisan','shop=*':'commerce','office=*':'agence'};
+  const custom = $('metier').value==='custom';
+  const term = WILD[tag] || (custom ? tag : label);
+  for(const v of villes){
+    log(`=== Google Places : ${term} à ${v} ===`);
+    const q = `${label} ${v}`, kept0 = current.length; let token, analysed = 0;
+    for(let p=0; p<3; p++){
+      if(cancelled) throw new Error('Recherche annulée');
+      status(`Google Places : « ${term} ${v} » – page ${p+1}/3… ${current.length-kept0} prospect(s)`);
+      const j = await gFetch(`${term} ${v}`, key, token);
+      for(const pl of (j.places||[])){
+        analysed++;
+        if(pl.businessStatus && pl.businessStatus!=='OPERATIONAL') continue;
+        const site = pl.websiteUri||'';
+        if(site && !SOCIAL.test(site)) continue;      // a déjà un vrai site
+        const id = 'g:'+pl.id, old = store.leads[id], nom = pl.displayName?.text||'';
+        const hrs = (pl.regularOpeningHours?.weekdayDescriptions||[]).join('; ');
+        const lead = {...carry(old,q), id, nom, activite:pl.primaryTypeDisplayName?.text||'', adresse:pl.formattedAddress||v, adresseComplete:true,
+          tel:pl.nationalPhoneNumber||'', email:'', horaires:!!hrs, social:false, site, type: site?'Réseau social':'Aucun site',
+          source:'google', cat: custom||tag.endsWith('=*') ? '' : tag, ville:v, metierLabel:label.replace(/^★\s*/,''),
+          tags:{...(hrs?{opening_hours:hrs}:{}), ...(site?{website:site}:{})},
+          maps:pl.googleMapsUri||`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(nom+' '+v)}`,
+          verif:`https://www.google.com/search?q=${encodeURIComponent(nom+' '+v)}`};
+        if(pl.rating!=null) lead.noteM = pl.rating; if(pl.userRatingCount!=null) lead.avisM = pl.userRatingCount;
+        lead.score = score(lead); addLead(lead);
+      }
+      render(); token = j.nextPageToken; if(!token) break;
+    }
+    log(`Bilan ${v} : ${analysed} fiches Google analysées, ${current.length-kept0} retenues`);
+    store.searches.unshift({q, tag, source:'google', metier:$('metier').value, ville:v, date:new Date().toISOString(), analyses:analysed, prospects:current.length-kept0});
+    save(); updateSide();
+  }
+}
+
+render(); updateSide(); log('Application chargée.');
+</script>
+</body>
+</html>
