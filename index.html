@@ -98,6 +98,7 @@
   #mapL,#mapF{height:62vh;min-height:340px;border-radius:12px;border:1px solid var(--bd);overflow:hidden;background:var(--card)}
   .kmove{display:none}
   .leaflet-container{background:var(--card)}
+  .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.9) contrast(.9) saturate(.7)}
   @media (max-width:760px){
     body{display:block}
     aside{position:fixed;left:0;right:0;bottom:0;top:auto;width:100%;height:auto;flex:none;flex-direction:row;padding:6px 4px calc(6px + env(safe-area-inset-bottom));border-right:0;border-top:1px solid var(--bd);z-index:40;overflow:visible}
@@ -1394,7 +1395,7 @@ const heatColor = s => s>=70 ? '#fb923c' : s>=50 ? '#facc15' : '#8b9591';
 function drawLeaflet(pts){
   if(!MAP){
     MAP = L.map('mapL').setView([46.6,2.4],6);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd',attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/attributions">CARTO</a>'}).addTo(MAP);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'}).addTo(MAP);
     MAPL = L.layerGroup().addTo(MAP);
   }
   MAPL.clearLayers(); const bounds = [];
