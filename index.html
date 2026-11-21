@@ -2,7 +2,13 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0e1110">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Prospecteur">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2716%27 fill=%27%234cc592%27/%3E%3Ccircle cx=%2732%27 cy=%2732%27 r=%2712%27 fill=%27none%27 stroke=%27%230e1110%27 stroke-width=%278%27/%3E%3C/svg%3E">
 <title>Prospecteur (gratuit)</title>
 <style>
   :root{--bg:#0e1110;--side:#131716;--card:#171b1a;--card2:#1c211f;--bd:#262c2a;--fg:#e8ebe9;--mut:#8b9591;--ac:#4cc592;--acd:#1f4d3b;--hot:#fb923c;--warm:#facc15;color-scheme:dark}
@@ -55,6 +61,16 @@
   .empty{color:var(--mut);padding:22px 0;text-align:center}
   .danger{color:#f87171;border-color:#7f1d1d}
   .info{background:var(--card2);border:1px solid var(--bd);border-radius:10px;padding:11px 14px;font-size:13px;color:var(--mut);margin-bottom:14px}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:14px}
+  .kpi{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px 14px}
+  .kpi b{font-size:22px;display:block;line-height:1.2}.kpi span{font-size:12px;color:var(--mut)}
+  .kanban{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(235px,1fr);gap:12px;overflow-x:auto;padding-bottom:12px}
+  .col{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px;min-height:280px}
+  .col.over{outline:1px dashed var(--ac)}
+  .col h3{font-size:13px;margin:2px 4px 6px;color:var(--mut);text-transform:uppercase;letter-spacing:.04em}
+  .n2{background:var(--card2);border:1px solid var(--bd);border-radius:99px;padding:0 7px;font-size:11px;margin-left:4px}
+  .kcard{background:var(--card2);border:1px solid var(--bd);border-radius:10px;padding:10px;margin-top:8px;cursor:grab}
+  th[data-sort]{cursor:pointer;user-select:none}th[data-sort]:hover{color:var(--fg)}th[data-sort]::after{content:" " attr(data-dir)}
   .drawer-bg{position:fixed;inset:0;background:#000a;z-index:50}
   .drawer{position:fixed;top:0;right:0;bottom:0;width:min(540px,100%);background:var(--side);border-left:1px solid var(--bd);z-index:51;overflow-y:auto;padding:22px 22px 44px}
   .drawer[hidden],.drawer-bg[hidden]{display:none}
@@ -73,13 +89,72 @@
   a.btnl{display:inline-block;padding:7px 12px;border:1px solid var(--bd);border-radius:8px;color:var(--fg);font-size:13px}
   a.btnl:hover{background:var(--card2);text-decoration:none}
   pre#logbox{margin:0;max-height:62vh;overflow:auto;background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:12px;font:12px/1.5 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-word;color:var(--mut)}
+  .mobonly{display:none}
+  .sheet{display:none}
+  .bar{display:grid;grid-template-columns:130px 1fr 40px;gap:10px;align-items:center;margin:7px 0;font-size:13.5px}
+  .bar .bt{height:10px;background:var(--card2);border-radius:99px;overflow:hidden}
+  .bar .bt i{display:block;height:100%;background:var(--ac);border-radius:99px}
+  .bar b{text-align:right}
+  #mapL,#mapF{height:62vh;min-height:340px;border-radius:12px;border:1px solid var(--bd);overflow:hidden;background:var(--card)}
+  .kmove{display:none}
+  .leaflet-container{background:var(--card)}
   @media (max-width:760px){
-    body{flex-direction:column}
-    aside{width:100%;flex:none;height:auto;position:static;flex-direction:row;align-items:center;padding:8px;overflow-x:auto;border-right:0;border-bottom:1px solid var(--bd)}
-    .logo{padding:0 8px;white-space:nowrap}.logo span{display:none}
-    nav{flex-direction:row}nav button{white-space:nowrap;padding:8px 10px}
-    .stats{display:none}
-    .content{padding:18px 14px}
+    body{display:block}
+    aside{position:fixed;left:0;right:0;bottom:0;top:auto;width:100%;height:auto;flex:none;flex-direction:row;padding:6px 4px calc(6px + env(safe-area-inset-bottom));border-right:0;border-top:1px solid var(--bd);z-index:40;overflow:visible}
+    .logo,.stats{display:none}
+    nav{flex-direction:row;width:100%;gap:0}
+    nav button{flex:1;min-width:0;flex-direction:column;justify-content:center;align-items:center;gap:2px;padding:7px 2px;font-size:11px;text-align:center;position:relative;border-radius:10px;white-space:nowrap}
+    nav button .ic{font-size:18px;width:auto;line-height:1.1}
+    nav button[data-more]{display:none}
+    nav button.mobonly{display:flex}
+    nav .n{position:absolute;top:1px;right:calc(50% - 24px);margin:0;font-size:10px;padding:0 5px}
+    .sheet{position:fixed;left:10px;right:10px;bottom:calc(74px + env(safe-area-inset-bottom));background:var(--side);border:1px solid var(--bd);border-radius:14px;padding:6px;z-index:45;box-shadow:0 12px 34px #000b}
+    .sheet.open{display:block}
+    .sheet button{display:flex;gap:14px;align-items:center;width:100%;background:transparent;border:0;color:var(--fg);font:inherit;font-size:15px;padding:14px 12px;border-radius:10px;text-align:left;cursor:pointer}
+    .sheet button:active{background:var(--card2)}
+    .sheet .ic{width:22px;text-align:center;color:var(--mut)}
+    .content{padding:14px 14px calc(96px + env(safe-area-inset-bottom))}
+    h1{font-size:19px}
+    p.sub{margin-bottom:14px}
+    input,select,textarea{font-size:16px !important}
+    select,input:not([type=checkbox]):not([type=file]),button.btn,button.sec{min-height:44px}
+    .row>label:not(.chk){flex:1 1 100% !important;min-width:0}
+    .row>label.chk{flex:1 1 100% !important;min-height:34px}
+    .row>button{flex:1 1 130px !important}
+    .two{grid-template-columns:1fr}
+    .kv{grid-template-columns:92px 1fr}
+    .hist-item{flex-wrap:wrap}
+    .bar{grid-template-columns:96px 1fr 34px;gap:8px}
+    #mapL,#mapF{height:56vh}
+    .sel,#selAll{width:22px;height:22px}
+    /* tableaux -> cartes */
+    #res table,#res tbody,#res tr,#res td,#p-leads table,#p-leads tbody,#p-leads tr,#p-leads td{display:block}
+    #res thead,#p-leads thead{display:none}
+    #res,#p-leads .scroll{background:transparent;border:0;padding:0}
+    #res tr,#htb tr{display:grid;gap:8px 10px;padding:12px;border:1px solid var(--bd);border-radius:12px;margin-bottom:10px;background:var(--card)}
+    #res td,#htb td{border:0;padding:0}
+    #res tr{grid-template-columns:1fr auto}
+    #res tr>td:nth-child(2){grid-column:1;grid-row:1}
+    #res tr>td:nth-child(1){grid-column:2;grid-row:1}
+    #res tr>td:nth-child(3),#res tr>td:nth-child(5),#res tr>td:nth-child(6){grid-column:1/-1}
+    #res tr>td:nth-child(4){display:none}
+    #htb tr{grid-template-columns:auto 1fr auto}
+    #htb tr>td:nth-child(1){grid-column:1;grid-row:1}
+    #htb tr>td:nth-child(3){grid-column:2;grid-row:1}
+    #htb tr>td:nth-child(2){grid-column:3;grid-row:1}
+    #htb tr>td:nth-child(n+4){grid-column:1/-1}
+    #res td.empty{grid-column:1/-1 !important;grid-row:auto !important;text-align:center}
+    td a[href^="tel:"]{display:inline-block;padding:9px 14px;border:1px solid var(--ac);border-radius:9px;margin:2px 0 4px;font-weight:600}
+    #bulk{position:sticky;bottom:calc(80px + env(safe-area-inset-bottom));background:var(--card);z-index:30;border:1px solid var(--bd) !important;border-radius:12px;padding:10px !important}
+    /* pipeline */
+    .kanban{grid-auto-columns:84%;scroll-snap-type:x mandatory}
+    .col{scroll-snap-align:start}
+    .kmove{display:block;margin-top:8px}.kmove select{width:100%}
+    .kcard{cursor:default}
+    /* fiche plein écran */
+    .drawer{width:100%;padding:14px 16px 40px;border-left:0}
+    .drawer>div:first-child{position:sticky;top:-14px;background:var(--side);z-index:3;padding:12px 0;margin-top:-12px}
+    .drawer textarea{min-height:190px}
   }
 </style>
 </head>
@@ -88,11 +163,16 @@
 <aside>
   <div class="logo"><i>◎</i><span>Prospecteur</span></div>
   <nav>
+    <button data-p="today"><span class="ic">★</span>Aujourd'hui <span class="n" id="nToday">0</span></button>
     <button data-p="search" class="on"><span class="ic">⌕</span>Recherche</button>
     <button data-p="leads"><span class="ic">☰</span>Prospects <span class="n" id="nLeads">0</span></button>
-    <button data-p="history"><span class="ic">↺</span>Recherches passées <span class="n" id="nSearches">0</span></button>
-    <button data-p="logs"><span class="ic">&gt;_</span>Logs</button>
-    <button data-p="settings"><span class="ic">⚙</span>Données</button>
+    <button data-p="pipeline"><span class="ic">▥</span>Pipeline</button>
+    <button data-p="map" data-more><span class="ic">◉</span>Carte</button>
+    <button data-p="stats" data-more><span class="ic">▤</span>Stats</button>
+    <button data-p="history" data-more><span class="ic">↺</span>Recherches passées <span class="n" id="nSearches">0</span></button>
+    <button data-p="logs" data-more><span class="ic">&gt;_</span>Logs</button>
+    <button data-p="settings" data-more><span class="ic">⚙</span>Données</button>
+    <button id="moreBtn" class="mobonly"><span class="ic">⋯</span>Plus</button>
   </nav>
   <div class="stats">
     <div>Prospects chauds : <b id="sHot">0</b></div>
@@ -171,6 +251,15 @@
     </div>
   </section>
 
+  <section id="p-today" hidden>
+    <h1>Aujourd'hui</h1>
+    <p class="sub">Ce qu'il faut faire en priorité, et où tu en es.</p>
+    <div class="kpis" id="kpis"></div>
+    <div class="card"><strong>Relances dues</strong><div id="tRel"></div></div>
+    <div class="card"><strong>Prospects chauds jamais contactés</strong><div id="tHot"></div></div>
+    <div class="card"><strong>À venir (7 jours)</strong><div id="tNext"></div></div>
+  </section>
+
   <section id="p-leads" hidden>
     <h1>Prospects</h1>
     <p class="sub">Tous les prospects enregistrés, avec leur statut et tes notes.</p>
@@ -179,16 +268,53 @@
         <label style="flex:0 0 200px">Statut
           <select id="hFiltre"><option value="">Tous</option></select>
         </label>
+        <label>Recherche<input id="hSearch" placeholder="Nom, ville, adresse…"></label>
+        <label class="chk"><input type="checkbox" id="hIgn"> Afficher les ignorés</label>
         <button class="sec" id="csv">Exporter CSV</button>
+      </div>
+      <div class="row" id="bulk" hidden style="margin-top:12px;padding-top:12px;border-top:1px solid var(--bd)">
+        <span id="bulkN" class="mut" style="align-self:center"></span>
+        <label style="flex:0 0 190px">Statut<select id="bulkStatut"><option value="">Changer le statut…</option></select></label>
+        <button class="sec" id="bulkIgn">Ignorer</button>
+        <button class="sec" id="bulkCsv">Exporter la sélection</button>
+        <button class="sec danger" id="bulkDel">Supprimer</button>
       </div>
     </div>
     <div class="card scroll">
       <table>
-        <thead><tr><th>Score</th><th>Entreprise</th><th>Contact</th><th>Statut</th><th>Note</th><th></th></tr></thead>
+        <thead><tr><th style="width:28px"><input type="checkbox" id="selAll" title="Tout sélectionner"></th><th data-sort="score">Score</th><th data-sort="nom">Entreprise</th><th>Contact</th><th data-sort="statut">Statut</th><th>Note</th><th></th></tr></thead>
         <tbody id="htb"></tbody>
       </table>
       <div class="empty" id="hEmpty" hidden>Aucun prospect enregistré pour l'instant.</div>
     </div>
+  </section>
+
+  <section id="p-pipeline" hidden>
+    <h1>Pipeline</h1>
+    <p class="sub">Glisse un prospect d'une colonne à l'autre pour changer son statut. Clique sur un nom pour ouvrir la fiche.</p>
+    <div class="kanban" id="kanban"></div>
+  </section>
+
+  <section id="p-map" hidden>
+    <h1>Carte</h1>
+    <p class="sub" id="mapInfo"></p>
+    <div class="card"><div class="row">
+      <label>Statut<select id="mapStatut"><option value="">Tous</option></select></label>
+      <label class="chk"><input type="checkbox" id="mapHot"> Chauds seulement (≥ 70)</label>
+    </div></div>
+    <div id="mapL" hidden></div>
+    <div id="mapF" hidden></div>
+    <p class="mut" id="mapNote" style="margin:8px 0 0;font-size:12.5px"></p>
+  </section>
+
+  <section id="p-stats" hidden>
+    <h1>Statistiques</h1>
+    <p class="sub">Vue d'ensemble de ton activité.</p>
+    <div class="card"><strong>Entonnoir</strong><div id="stFunnel"></div></div>
+    <div class="card"><strong>Chaleur des prospects</strong><div id="stHeat"></div></div>
+    <div class="card"><strong>8 dernières semaines</strong><div id="stWeeks"></div></div>
+    <div class="card"><strong>Par source</strong><div id="stSrc"></div></div>
+    <div class="card"><strong>Villes</strong><div id="stCity"></div></div>
   </section>
 
   <section id="p-history" hidden>
@@ -251,6 +377,13 @@
 
 </div></div>
 
+<div id="more" class="sheet">
+  <button data-p="map"><span class="ic">◉</span>Carte</button>
+  <button data-p="stats"><span class="ic">▤</span>Statistiques</button>
+  <button data-p="history"><span class="ic">↺</span>Recherches passées</button>
+  <button data-p="logs"><span class="ic">&gt;_</span>Logs</button>
+  <button data-p="settings"><span class="ic">⚙</span>Données & sauvegarde</button>
+</div>
 <div id="drawerBg" class="drawer-bg" hidden></div>
 <div id="drawer" class="drawer" hidden></div>
 
@@ -280,13 +413,18 @@ const esc = s => String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>'
 
 /* ---------- navigation ---------- */
 function show(p){
-  ['search','leads','history','logs','settings'].forEach(x=>{ $('p-'+x).hidden = x!==p; });
-  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on', b.dataset.p===p));
+  ['today','search','leads','pipeline','map','stats','history','logs','settings'].forEach(x=>{ $('p-'+x).hidden = x!==p; });
+  document.querySelectorAll('nav button[data-p]').forEach(b=>b.classList.toggle('on', b.dataset.p===p));
+  $('moreBtn').classList.toggle('on', ['map','stats','history','logs','settings'].includes(p));
   if(p==='leads') renderLeads();
   if(p==='history') renderSearches();
+  if(p==='today') renderToday();
+  if(p==='pipeline') renderKanban();
+  if(p==='map') renderMap();
+  if(p==='stats') renderStats();
   window.scrollTo(0,0);
 }
-document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>show(b.dataset.p));
+document.querySelectorAll('nav button[data-p]').forEach(b=>b.onclick=()=>show(b.dataset.p));
 $('metier').onchange = () => { $('customWrap').hidden = $('metier').value!=='custom'; };
 
 /* ---------- score ---------- */
@@ -316,13 +454,14 @@ const badge = s => `<span class="badge ${s>=70?'b-hot':s>=50?'b-warm':''}">${s>=
 const statutSelect = (id, cur) => `<select data-id="${esc(id)}" class="st">${STATUTS.map(s=>`<option ${s===cur?'selected':''}>${s}</option>`).join('')}</select>`;
 
 function updateSide(){
-  const L = Object.values(store.leads);
+  const L = Object.values(store.leads).filter(l=>!l.ignore);
   $('nLeads').textContent = L.length; $('nSearches').textContent = store.searches.length;
   $('sHot').textContent = L.filter(l=>l.score>=70).length;
   $('sTodo').textContent = L.filter(l=>l.statut==='À contacter').length;
   $('sWon').textContent = L.filter(l=>l.statut==='Client').length;
   const today = new Date().toISOString().slice(0,10);
   $('sRel').textContent = L.filter(l=>l.relance && l.relance<=today && !['Client','Refusé'].includes(l.statut)).length;
+  $('nToday').textContent = $('sRel').textContent;
   updateBackupUI();
 }
 
@@ -461,6 +600,7 @@ $('go').onclick = async () => {
       for(const el of els){
         const id = el.type[0]+el.id;
         if(seenIds.has(id)) continue; seenIds.add(id);
+        if(store.leads[id]?.ignore) continue;
         const lead = toLead(el, q, v, store.leads[id]);
         const ws = (el.tags||{}).website || (el.tags||{})['contact:website'] || (el.tags||{}).url || '';
         if(ws && !SOCIAL.test(ws)) continue;   // a déjà un vrai site : on ignore
@@ -487,7 +627,7 @@ $('cancel').onclick = () => { log('Annulation demandée','warn'); ABORT_ALL(); }
 function filtered(){
   const sc = +$('fScore').value||0;
   return current.filter(l =>
-    sc_(l)>=sc &&
+    !store.leads[l.id]?.ignore && sc_(l)>=sc &&
     (l.type!=='Réseau social' || $('fSocial').checked) &&
     (!$('fPhone').checked || l.tel) &&
     (!$('fVus').checked || store.leads[l.id].statut==='À contacter')
@@ -497,14 +637,14 @@ function filtered(){
 function rowHTML(l, mode){
   const S = store.leads[l.id] || l; const st = S.statut;
   const contact = `${l.tel?`<a href="tel:${esc(l.tel.replace(/\s/g,''))}">${esc(l.tel)}</a>`:'<span class="mut">pas de téléphone</span>'}${l.email?`<br><small>${esc(l.email)}</small>`:''}<br><small>${esc(l.adresse)}</small>`;
-  const nom = `<button class="linkbtn" data-fiche="${esc(l.id)}">${esc(l.nom)}</button> ${l.nouveau?'<span class="tag new">nouveau</span>':(mode==='res'?'<span class="tag">déjà vu</span>':'')}<br><small>${esc(l.activite)}${l.activite?' · ':''}<a href="${esc(l.maps)}" target="_blank" rel="noopener">Maps</a> · <a href="${esc(l.verif)}" target="_blank" rel="noopener">Vérifier</a>${S.noteM?` · ${esc(S.noteM)} ★ (${esc(S.avisM||0)} avis)`:''}</small>`;
+  const nom = `<button class="linkbtn" data-fiche="${esc(l.id)}">${esc(l.nom)}</button> ${l.nouveau?'<span class="tag new">nouveau</span>':(mode==='res'?'<span class="tag">déjà vu</span>':'')}${S.ignore?' <span class="tag">ignoré</span>':''}<br><small>${esc(l.activite)}${l.activite?' · ':''}<a href="${esc(l.maps)}" target="_blank" rel="noopener">Maps</a> · <a href="${esc(l.verif)}" target="_blank" rel="noopener">Vérifier</a>${S.noteM?` · ${esc(S.noteM)} ★ (${esc(S.avisM||0)} avis)`:''}</small>`;
   if(mode==='res') return `<tr>
     <td>${badge(S.score)}</td><td>${nom}</td><td>${contact}</td>
     <td><small>${l.extra?.creation?'Créée le '+new Date(l.extra.creation).toLocaleDateString('fr-FR'):(l.horaires?'Horaires renseignés':'—')}</small></td>
     <td><span class="tag">${l.type}</span>${l.site?`<br><small>${esc(l.site.slice(0,38))}</small>`:''}</td>
     <td>${statutSelect(l.id, st)}</td></tr>`;
   return `<tr>
-    <td>${badge(S.score)}</td><td>${nom}<br><small>${new Date(l.date).toLocaleDateString('fr-FR')} · ${esc(l.requete||'')}</small></td><td>${contact}</td>
+    <td><input type="checkbox" class="sel" data-id="${esc(l.id)}" ${SEL.has(l.id)?'checked':''}></td><td>${badge(S.score)}</td><td>${nom}<br><small>${new Date(l.date).toLocaleDateString('fr-FR')} · ${esc(l.requete||'')}</small></td><td>${contact}</td>
     <td>${statutSelect(l.id, st)}</td>
     <td><input class="note" data-id="${esc(l.id)}" value="${esc(l.memo||'')}" placeholder="Note…"></td>
     <td><button class="sec del" data-id="${esc(l.id)}" title="Supprimer">✕</button></td></tr>`;
@@ -518,13 +658,6 @@ function render(){
 
 $('hFiltre').innerHTML += STATUTS.map(s=>`<option>${s}</option>`).join('');
 $('hFiltre').onchange = renderLeads;
-function renderLeads(){
-  const f = $('hFiltre').value;
-  const list = Object.values(store.leads).filter(l=>!f||l.statut===f).sort((a,b)=>b.score-a.score);
-  $('htb').innerHTML = list.map(l=>rowHTML(l,'hist')).join('');
-  $('hEmpty').hidden = list.length>0;
-  updateSide();
-}
 function renderSearches(){
   $('searches').innerHTML = store.searches.length ? store.searches.map((s,i)=>`
     <div class="hist-item"><span><strong>${esc(s.q)}</strong><br><small>${new Date(s.date).toLocaleString('fr-FR')} · ${s.prospects} prospects sur ${s.analyses} fiches · ${({osm:'OpenStreetMap',sirene:'Base officielle',google:'Google'})[s.source||'osm']}</small></span>
@@ -538,7 +671,7 @@ document.addEventListener('change', e=>{
     if(!$('drawer').hidden && drawerId===l.id) openFiche(l.id);
     const c = current.find(x=>x.id===l.id); if(c) c.statut = l.statut;
     updateSide();
-    if(!$('p-leads').hidden) renderLeads(); else if($('fVus').checked) render();
+    if(!$('p-leads').hidden) renderLeads(); else if(!$('p-pipeline').hidden) renderKanban(); else if(!$('p-today').hidden) renderToday(); else if($('fVus').checked) render();
   }
 });
 document.addEventListener('input', e=>{
@@ -652,9 +785,25 @@ function openFiche(id){
     </div>
     <label style="margin-top:10px">Notes<textarea data-f="memo" data-id="${esc(l.id)}" placeholder="Ce qui a été dit, objections, budget…">${esc(l.memo||'')}</textarea></label>
 
-    <div class="sec-t">Message d'accroche</div>
-    <textarea id="dMsg" style="min-height:210px">${esc(accroche(l))}</textarea>
-    <button class="sec" id="dCopy">Copier le message</button>
+    <div class="sec-t">Messages</div>
+    <label style="margin-bottom:8px">Type de message
+      <select id="dMsgType">
+        <option value="email">E-mail d'accroche</option>
+        <option value="sms">SMS</option>
+        <option value="call">Script d'appel</option>
+        <option value="r1">Relance n°1 (J+7)</option>
+        <option value="r2">Relance n°2 (dernière)</option>
+        <option value="devis">Après envoi du devis</option>
+      </select>
+    </label>
+    <textarea id="dMsg" style="min-height:210px">${esc(msgFor(l,'email').body)}</textarea>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+      <button class="sec" id="dCopy">Copier le message</button>
+      <button class="sec" id="dMail">E-mail</button>
+      <button class="sec" id="dWa">WhatsApp</button>
+      <button class="sec" id="dSms">SMS</button>
+    </div>
+    <button class="btn" id="dDone" style="margin-top:10px">Marquer comme contacté (relance dans 7 jours)</button>
 
     <div class="sec-t">Maquette de site</div>
     <p style="margin:0 0 10px"><small>Génère une page d'accueil de démonstration à partir de la fiche (nom, adresse, téléphone, horaires, note saisie). Les textes sont génériques, à personnaliser.</small></p>
@@ -668,12 +817,12 @@ function openFiche(id){
     ${(l.histo||[]).slice().reverse().map(x=>`<div class="tl">${fmtD(x.d)} · ${esc(x.t)}</div>`).join('') || '<div class="tl">—</div>'}
 
     <details><summary>Données brutes OpenStreetMap</summary><pre>${l.tags?esc(JSON.stringify(l.tags,null,2)):'Non disponibles pour ce prospect (relance la recherche pour les récupérer).'}</pre></details>
-    <div style="margin-top:22px"><button class="sec danger" id="dDel">Supprimer ce prospect</button></div>`;
+    <div style="margin-top:22px;display:flex;gap:8px;flex-wrap:wrap"><button class="sec" id="dIgn">${l.ignore?'Restaurer ce prospect':'Ignorer ce prospect'}</button><button class="sec danger" id="dDel">Supprimer ce prospect</button></div>`;
   $('drawer').hidden = false; $('drawerBg').hidden = false;
 }
 function closeFiche(){
   $('drawer').hidden = true; $('drawerBg').hidden = true; drawerId = null;
-  render(); if(!$('p-leads').hidden) renderLeads(); updateSide();
+  render(); if(!$('p-leads').hidden) renderLeads(); if(!$('p-pipeline').hidden) renderKanban(); if(!$('p-today').hidden) renderToday(); updateSide();
 }
 document.addEventListener('keydown', e=>{ if(e.key==='Escape' && !$('drawer').hidden) closeFiche(); });
 $('drawerBg').onclick = closeFiche;
@@ -898,10 +1047,12 @@ const monthsSince = d => (Date.now() - new Date(d)) / (30.44*86400000);
 const carry = (old, q) => ({
   statut: old?.statut||'À contacter', memo: old?.memo||'', date: old?.date||new Date().toISOString(), requete: old?.requete||q, nouveau: !old,
   noteM: old?.noteM||'', avisM: old?.avisM||'', dernier: old?.dernier||'', relance: old?.relance||'',
+  ignore: old?.ignore||false,
   histo: old?.histo||[{d:new Date().toISOString(), t:'Prospect détecté'}]
 });
 function addLead(lead){
   if(seenIds.has(lead.id)) return false;
+  if(store.leads[lead.id]?.ignore){ seenIds.add(lead.id); return false; }
   seenIds.add(lead.id); current.push(lead);
   const {nouveau, ...rest} = lead; store.leads[lead.id] = rest;
   return true;
@@ -979,7 +1130,7 @@ async function runSirene(tag, label, villes){
 }
 
 /* ----- Google Places ----- */
-const G_MASK = ['places.id','places.displayName','places.primaryTypeDisplayName','places.formattedAddress','places.nationalPhoneNumber','places.websiteUri','places.googleMapsUri','places.rating','places.userRatingCount','places.businessStatus','places.regularOpeningHours','nextPageToken'].join(',');
+const G_MASK = ['places.id','places.displayName','places.primaryTypeDisplayName','places.formattedAddress','places.nationalPhoneNumber','places.websiteUri','places.googleMapsUri','places.rating','places.userRatingCount','places.businessStatus','places.regularOpeningHours','places.location','nextPageToken'].join(',');
 async function gFetch(q, key, token){
   const body = {textQuery:q, languageCode:'fr', regionCode:'FR', pageSize:20}; if(token) body.pageToken = token;
   log(`Google Places : « ${q} »${token?' (page suivante)':''}`);
@@ -1014,7 +1165,7 @@ async function runGoogle(tag, label, villes){
         const lead = {...carry(old,q), id, nom, activite:pl.primaryTypeDisplayName?.text||'', adresse:pl.formattedAddress||v, adresseComplete:true,
           tel:pl.nationalPhoneNumber||'', email:'', horaires:!!hrs, social:false, site, type: site?'Réseau social':'Aucun site',
           source:'google', cat: custom||tag.endsWith('=*') ? '' : tag, ville:v, metierLabel:label.replace(/^★\s*/,''),
-          tags:{...(hrs?{opening_hours:hrs}:{}), ...(site?{website:site}:{})},
+          tags:{...(hrs?{opening_hours:hrs}:{}), ...(site?{website:site}:{})}, lat:pl.location?.latitude, lon:pl.location?.longitude,
           maps:pl.googleMapsUri||`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(nom+' '+v)}`,
           verif:`https://www.google.com/search?q=${encodeURIComponent(nom+' '+v)}`};
         if(pl.rating!=null) lead.noteM = pl.rating; if(pl.userRatingCount!=null) lead.avisM = pl.userRatingCount;
@@ -1026,6 +1177,284 @@ async function runGoogle(tag, label, villes){
     store.searches.unshift({q, tag, source:'google', metier:$('metier').value, ville:v, date:new Date().toISOString(), analyses:analysed, prospects:current.length-kept0});
     save(); updateSide();
   }
+}
+
+/* ---------- messages types, Aujourd'hui, pipeline, outils prospects ---------- */
+const todayStr = () => new Date().toISOString().slice(0,10);
+const addDays = n => { const d = new Date(); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); };
+const sansOf = l => l.type==='Aucun site' ? "n'a pas encore de site internet" : l.type==='À vérifier' ? "n'a, à ma connaissance, pas encore de site internet" : "n'a pour l'instant qu'une page sur les réseaux sociaux";
+const phoneIntl = t => { const d = String(t||'').replace(/[^\d+]/g,''); if(d.startsWith('+')) return d.slice(1); if(d.startsWith('00')) return d.slice(2); if(d.startsWith('0')) return '33'+d.slice(1); return d; };
+
+function msgFor(l, type){
+  const P = store.profile||{}, nom = l.nom, ville = l.ville||'votre ville';
+  const prenom = P.nom||'[Votre prénom]';
+  const sign = prenom + ' – ' + (P.tel||'[Votre numéro]') + (P.email?`\n${P.email}`:'') + (P.site?`\n${P.site}`:'');
+  const felic = l.source==='sirene' ? `Félicitations pour la création de ${nom} ! ` : '';
+  switch(type){
+    case 'sms':
+      return {subject:'', body:`Bonjour, ici ${prenom}. ${felic}Je crée des sites internet pour les professionnels de ${ville} et j'ai vu que ${nom} ${sansOf(l)}. Puis-je vous montrer une maquette ? ${P.tel||''}`.trim()};
+    case 'call':
+      return {subject:'', body:`SCRIPT D'APPEL – ${nom}
+
+1. Introduction (10 secondes)
+« Bonjour, ${prenom} à l'appareil. Je ne vous dérange pas deux minutes ? »
+
+2. Accroche
+« ${felic}Je crée des sites internet pour les professionnels de ${ville}. J'ai remarqué que ${nom} ${sansOf(l)}. »
+
+3. Question ouverte
+« Comment vos clients vous trouvent-ils aujourd'hui ? »
+
+4. Proposition
+« Je peux vous préparer une maquette de votre page d'accueil pour que vous voyiez le résultat. Quand seriez-vous disponible 10 minutes ? »
+
+OBJECTIONS
+• « Je n'ai pas le temps » → « Je comprends. Je peux vous envoyer la maquette par message, vous la regardez quand vous voulez. »
+• « J'ai déjà Facebook / Instagram » → « C'est un bon début. Un site apparaît dans les recherches Google et rassure les nouveaux clients. »
+• « C'est trop cher » → « Je vous propose d'abord la maquette, puis un devis clair, sans engagement. »
+• « Je n'en ai pas besoin » → « Pas de souci. Puis-je vous laisser mon contact au cas où ? »
+
+CONCLUSION
+Noter dans la fiche le résultat de l'appel et la date de relance.`};
+    case 'r1':
+      return {subject:`Re : un site internet pour ${nom} ?`, body:`Bonjour,\n\nJe me permets de revenir vers vous suite à mon précédent message concernant un site internet pour ${nom}. Je peux vous montrer une maquette, sans engagement, en 10 minutes. Seriez-vous disponible cette semaine ?\n\nCordialement,\n${sign}`};
+    case 'r2':
+      return {subject:`Dernier message – ${nom}`, body:`Bonjour,\n\nSans retour de votre part, je ne vous relancerai plus à ce sujet. Si l'idée d'un site pour ${nom} vous intéresse plus tard, ma proposition reste ouverte : un simple message suffit.\n\nJe vous souhaite une belle continuation.\n\nCordialement,\n${sign}`};
+    case 'devis':
+      return {subject:`Votre devis – site de ${nom}`, body:`Bonjour,\n\nJe reviens vers vous au sujet du devis que je vous ai envoyé pour le site de ${nom}. Avez-vous pu le consulter ? Je reste disponible pour répondre à vos questions ou ajuster la proposition.\n\nCordialement,\n${sign}`};
+    default:
+      return {subject:`Un site internet pour ${nom} ?`, body:accroche(l)};
+  }
+}
+
+function setStatut(id, s){
+  const l = store.leads[id]; if(!l || l.statut===s) return;
+  l.statut = s; (l.histo = l.histo||[]).push({d:new Date().toISOString(), t:'Statut → '+s});
+  const c = current.find(x=>x.id===id); if(c) c.statut = s;
+  save(); updateSide();
+}
+function markContacted(id){
+  const l = store.leads[id]; if(!l) return;
+  if(l.statut==='À contacter') l.statut = 'Contacté';
+  l.dernier = todayStr(); l.relance = addDays(7);
+  (l.histo = l.histo||[]).push({d:new Date().toISOString(), t:'Contact effectué · relance le '+l.relance});
+  const c = current.find(x=>x.id===id); if(c) c.statut = l.statut;
+  save(); updateSide();
+}
+
+/* ----- fiche : messages ----- */
+document.addEventListener('change', e=>{
+  if(e.target.id==='dMsgType'){ const l = store.leads[drawerId]; if(l) $('dMsg').value = msgFor(l, e.target.value).body; }
+});
+document.addEventListener('click', e=>{
+  const l = store.leads[drawerId];
+  const log_ = t => { if(l){ (l.histo = l.histo||[]).push({d:new Date().toISOString(), t}); save(); } };
+  if(e.target.closest('#dMail') && l){
+    const type = $('dMsgType').value, subj = msgFor(l,type).subject || `Un site internet pour ${l.nom} ?`;
+    log_('Message préparé par e-mail ('+type+')');
+    location.href = `mailto:${l.email||''}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent($('dMsg').value)}`;
+  }
+  if(e.target.closest('#dWa') && l){
+    if(!l.tel) return alert("Pas de numéro de téléphone pour ce prospect.");
+    log_('Message préparé par WhatsApp');
+    window.open(`https://wa.me/${phoneIntl(l.tel)}?text=${encodeURIComponent($('dMsg').value)}`,'_blank');
+  }
+  if(e.target.closest('#dSms') && l){
+    if(!l.tel) return alert("Pas de numéro de téléphone pour ce prospect.");
+    log_('Message préparé par SMS');
+    location.href = `sms:${l.tel.replace(/\s/g,'')}?body=${encodeURIComponent($('dMsg').value)}`;
+  }
+  if(e.target.closest('#dDone') && l){ markContacted(drawerId); openFiche(drawerId); }
+  if(e.target.closest('#dIgn') && l){
+    l.ignore = !l.ignore; (l.histo = l.histo||[]).push({d:new Date().toISOString(), t: l.ignore?'Prospect ignoré':'Prospect restauré'}); save(); closeFiche();
+  }
+});
+
+/* ----- Aujourd'hui + tableau de bord ----- */
+function tRow(l, info){
+  return `<div class="hist-item"><span><button class="linkbtn" data-fiche="${esc(l.id)}">${esc(l.nom)}</button> ${badge(l.score)}<br><small>${esc(l.ville||'')}${l.tel?' · '+esc(l.tel):''}${info?' · '+info:''}</small></span><button class="sec" data-contact="${esc(l.id)}">Contacté ✓</button></div>`;
+}
+function renderToday(){
+  const L = Object.values(store.leads).filter(l=>!l.ignore), t = todayStr(), in7 = addDays(7);
+  const open = l => !['Client','Refusé'].includes(l.statut);
+  const cnt = s => L.filter(l=>l.statut===s).length;
+  const contacted = L.filter(l=>l.statut!=='À contacter').length;
+  const week = L.filter(l=>l.dernier && l.dernier>=addDays(-7)).length;
+  const conv = contacted ? Math.round(cnt('Client')/contacted*100) : 0;
+  const tiles = [[L.length,'Prospects'],[L.filter(l=>l.score>=70).length,'Chauds'],[contacted,'Contactés'],[week,'Contacts (7 j)'],[cnt('Intéressé'),'Intéressés'],[cnt('Devis envoyé'),'Devis envoyés'],[cnt('Client'),'Clients'],[conv+' %','Conversion']];
+  $('kpis').innerHTML = tiles.map(([v,k])=>`<div class="kpi"><b>${v}</b><span>${k}</span></div>`).join('');
+  const due = L.filter(l=>l.relance && l.relance<=t && open(l)).sort((a,b)=>a.relance.localeCompare(b.relance));
+  const hot = L.filter(l=>l.statut==='À contacter' && l.score>=70 && !l.dernier && !l.relance).sort((a,b)=>b.score-a.score).slice(0,10);
+  const next = L.filter(l=>l.relance && l.relance>t && l.relance<=in7 && open(l)).sort((a,b)=>a.relance.localeCompare(b.relance));
+  const fill = (id, arr, fn, empty) => { $(id).innerHTML = arr.length ? arr.map(fn).join('') : `<div class="empty">${empty}</div>`; };
+  fill('tRel', due, l=>tRow(l, 'relance prévue le '+new Date(l.relance).toLocaleDateString('fr-FR')), 'Aucune relance due. 👌');
+  fill('tHot', hot, l=>tRow(l, ''), 'Aucun prospect chaud en attente.');
+  fill('tNext', next, l=>tRow(l, 'relance le '+new Date(l.relance).toLocaleDateString('fr-FR')), 'Rien de prévu dans les 7 prochains jours.');
+}
+document.addEventListener('click', e=>{
+  const c = e.target.closest('[data-contact]'); if(!c) return;
+  markContacted(c.dataset.contact); renderToday();
+});
+
+/* ----- pipeline ----- */
+function kcard(l){
+  return `<div class="kcard" draggable="true" data-id="${esc(l.id)}"><button class="linkbtn" data-fiche="${esc(l.id)}">${esc(l.nom)}</button><div style="margin:5px 0">${badge(l.score)}</div><small>${esc(l.ville||'')}${l.tel?' · '+esc(l.tel):''}${l.relance?' · relance '+esc(l.relance):''}</small><div class="kmove">${statutSelect(l.id, l.statut)}</div></div>`;
+}
+function renderKanban(){
+  const L = Object.values(store.leads).filter(l=>!l.ignore);
+  $('kanban').innerHTML = STATUTS.map(s=>{
+    const items = L.filter(l=>l.statut===s).sort((a,b)=>b.score-a.score);
+    return `<div class="col" data-statut="${esc(s)}"><h3>${esc(s)} <span class="n2">${items.length}</span></h3>${items.slice(0,40).map(kcard).join('')}${items.length>40?`<small class="mut">+ ${items.length-40} autres</small>`:''}</div>`;
+  }).join('');
+}
+document.addEventListener('dragstart', e=>{ const c = e.target.closest?.('.kcard'); if(!c) return; e.dataTransfer.setData('text/plain', c.dataset.id); e.dataTransfer.effectAllowed = 'move'; });
+document.addEventListener('dragover', e=>{ const col = e.target.closest?.('.col'); if(!col) return; e.preventDefault(); col.classList.add('over'); });
+document.addEventListener('dragleave', e=>{ const col = e.target.closest?.('.col'); if(col && !col.contains(e.relatedTarget)) col.classList.remove('over'); });
+document.addEventListener('drop', e=>{
+  const col = e.target.closest?.('.col'); if(!col) return;
+  e.preventDefault(); col.classList.remove('over');
+  setStatut(e.dataTransfer.getData('text/plain'), col.dataset.statut); renderKanban();
+});
+
+/* ----- tableau Prospects : tri, recherche, sélection, actions en lot ----- */
+let sortKey = 'score', sortDir = -1;
+const SEL = new Set();
+function renderLeads(){
+  const f = $('hFiltre').value, qs = ($('hSearch').value||'').toLowerCase().trim(), showIgn = $('hIgn').checked;
+  const list = Object.values(store.leads).filter(l=>(!f || l.statut===f) && (showIgn || !l.ignore) && (!qs || `${l.nom} ${l.ville} ${l.adresse}`.toLowerCase().includes(qs)));
+  const key = {score:l=>l.score, nom:l=>(l.nom||'').toLowerCase(), statut:l=>STATUTS.indexOf(l.statut), date:l=>l.date||''};
+  const k = key[sortKey] || key.score;
+  list.sort((a,b)=>{ const x = k(a), y = k(b); return (x<y?-1:x>y?1:0)*sortDir; });
+  $('htb').innerHTML = list.map(l=>rowHTML(l,'hist')).join('');
+  $('hEmpty').hidden = list.length>0;
+  document.querySelectorAll('th[data-sort]').forEach(th=>{ th.dataset.dir = th.dataset.sort===sortKey ? (sortDir<0?'▼':'▲') : ''; });
+  const all = $('selAll'); if(all) all.checked = list.length>0 && list.every(l=>SEL.has(l.id));
+  updateBulk(); updateSide();
+}
+function updateBulk(){ $('bulk').hidden = !SEL.size; $('bulkN').textContent = `${SEL.size} sélectionné(s)`; }
+$('hSearch').oninput = renderLeads; $('hIgn').onchange = renderLeads;
+$('bulkStatut').innerHTML += STATUTS.map(s=>`<option>${s}</option>`).join('');
+document.addEventListener('click', e=>{
+  const th = e.target.closest('th[data-sort]'); if(!th) return;
+  const k = th.dataset.sort;
+  if(sortKey===k) sortDir *= -1; else { sortKey = k; sortDir = (k==='nom'||k==='statut') ? 1 : -1; }
+  renderLeads();
+});
+document.addEventListener('change', e=>{
+  if(e.target.classList.contains('sel')){ e.target.checked ? SEL.add(e.target.dataset.id) : SEL.delete(e.target.dataset.id); updateBulk(); }
+  if(e.target.id==='selAll'){ document.querySelectorAll('#htb .sel').forEach(c=>{ c.checked = e.target.checked; e.target.checked ? SEL.add(c.dataset.id) : SEL.delete(c.dataset.id); }); updateBulk(); }
+});
+$('bulkStatut').onchange = e => { const s = e.target.value; if(!s) return; [...SEL].forEach(id=>setStatut(id,s)); e.target.value = ''; renderLeads(); };
+$('bulkIgn').onclick = () => {
+  [...SEL].forEach(id=>{ const l = store.leads[id]; if(l){ l.ignore = true; (l.histo = l.histo||[]).push({d:new Date().toISOString(), t:'Prospect ignoré'}); } });
+  SEL.clear(); save(); renderLeads(); render();
+};
+$('bulkDel').onclick = () => {
+  if(!SEL.size || !confirm(`Supprimer ${SEL.size} prospect(s) ?`)) return;
+  SEL.forEach(id=>delete store.leads[id]); SEL.clear(); save(); renderLeads(); render();
+};
+function csvFor(list, fname){
+  const q = v => '"'+String(v??'').replace(/"/g,'""')+'"';
+  const head = ['Score','Nom','Adresse','Téléphone','Email','Site','Statut','Note perso','Date','Maps','Note Google','Avis Google','Dernier contact','Relance'];
+  const rows = list.map(l=>[l.score,l.nom,l.adresse,l.tel,l.email,l.site||'Aucun',l.statut,l.memo,new Date(l.date).toLocaleDateString('fr-FR'),l.maps,l.noteM,l.avisM,l.dernier,l.relance].map(q).join(';'));
+  const blob = new Blob(['﻿'+[head.map(q).join(';'),...rows].join('\n')],{type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = fname; a.click();
+}
+$('csv').onclick = () => csvFor(Object.values(store.leads).filter(l=>!l.ignore).sort((a,b)=>b.score-a.score), 'prospects.csv');
+$('bulkCsv').onclick = () => csvFor([...SEL].map(id=>store.leads[id]).filter(Boolean), 'prospects-selection.csv');
+
+/* ---------- menu « Plus » (mobile) ---------- */
+$('moreBtn').onclick = () => $('more').classList.toggle('open');
+document.addEventListener('click', e=>{
+  const b = e.target.closest('#more button[data-p]');
+  if(b){ show(b.dataset.p); $('more').classList.remove('open'); return; }
+  if(!e.target.closest('#more') && !e.target.closest('#moreBtn')) $('more').classList.remove('open');
+});
+
+/* ---------- carte ---------- */
+let MAP = null, MAPL = null, leafletState = null;
+function loadLeaflet(){
+  if(window.L) return Promise.resolve(true);
+  if(leafletState) return leafletState;
+  leafletState = new Promise(res=>{
+    const css = document.createElement('link');
+    css.rel = 'stylesheet'; css.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+    css.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY='; css.crossOrigin = '';
+    document.head.appendChild(css);
+    const s = document.createElement('script');
+    s.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+    s.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo='; s.crossOrigin = '';
+    s.onload = () => res(!!window.L);
+    s.onerror = () => { log('Leaflet non chargé : carte simplifiée (hors ligne ?)','warn'); leafletState = null; res(false); };
+    document.head.appendChild(s);
+  });
+  return leafletState;
+}
+const heatColor = s => s>=70 ? '#fb923c' : s>=50 ? '#facc15' : '#8b9591';
+function drawLeaflet(pts){
+  if(!MAP){
+    MAP = L.map('mapL').setView([46.6,2.4],6);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd',attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/attributions">CARTO</a>'}).addTo(MAP);
+    MAPL = L.layerGroup().addTo(MAP);
+  }
+  MAPL.clearLayers(); const bounds = [];
+  pts.forEach(l=>{
+    L.circleMarker([+l.lat,+l.lon],{radius:9,color:'#0e1110',weight:2,fillColor:heatColor(l.score),fillOpacity:.95}).addTo(MAPL)
+      .bindPopup(`<b>${esc(l.nom)}</b><br>${esc(l.tel||'')}<br><a data-fiche="${esc(l.id)}" style="cursor:pointer;text-decoration:underline">Ouvrir la fiche</a>`);
+    bounds.push([+l.lat,+l.lon]);
+  });
+  setTimeout(()=>{ MAP.invalidateSize(); if(bounds.length) MAP.fitBounds(bounds,{padding:[30,30],maxZoom:15}); },60);
+  $('mapNote').textContent = 'Orange : chaud · jaune : tiède · gris : froid. Touche un point pour ouvrir la fiche.';
+}
+function drawFallback(pts){
+  const el = $('mapF');
+  $('mapNote').textContent = 'Fond de carte indisponible (connexion internet requise) : positions relatives. Orange : chaud · jaune : tiède · gris : froid.';
+  if(!pts.length){ el.innerHTML = '<div class="empty">Aucun prospect géolocalisé.</div>'; return; }
+  const lat = pts.map(p=>+p.lat), lon = pts.map(p=>+p.lon);
+  const minLa = Math.min(...lat), maxLa = Math.max(...lat), minLo = Math.min(...lon), maxLo = Math.max(...lon);
+  const k = Math.cos((minLa+maxLa)/2*Math.PI/180);
+  const w = ((maxLo-minLo)*k) || 0.01, hg = (maxLa-minLa) || 0.01, W = 1000, H = Math.max(320, Math.min(700, Math.round(W*hg/w)));
+  const sx = l => 70 + ((+l.lon-minLo)*k/w)*(W-140), sy = l => 70 + ((maxLa-+l.lat)/hg)*(H-140);
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Positions des prospects">${
+    pts.map(l=>`<circle cx="${sx(l).toFixed(1)}" cy="${sy(l).toFixed(1)}" r="24" fill="${heatColor(l.score)}" stroke="#0e1110" stroke-width="2" data-fiche="${esc(l.id)}" style="cursor:pointer"><title>${esc(l.nom)}</title></circle>`).join('')
+  }</svg>`;
+}
+async function renderMap(){
+  const all = Object.values(store.leads).filter(l=>!l.ignore), st = $('mapStatut').value, hot = $('mapHot').checked;
+  const has = l => l.lat!=null && l.lon!=null && !isNaN(+l.lat) && !isNaN(+l.lon);
+  const pts = all.filter(l=>has(l) && (!st || l.statut===st) && (!hot || l.score>=70));
+  $('mapInfo').textContent = `${pts.length} prospect(s) sur la carte · ${all.filter(l=>!has(l)).length} sans coordonnées`;
+  const ok = await loadLeaflet();
+  $('mapL').hidden = !ok; $('mapF').hidden = ok;
+  if(ok) drawLeaflet(pts); else drawFallback(pts);
+}
+$('mapStatut').innerHTML += STATUTS.map(s=>`<option>${s}</option>`).join('');
+$('mapStatut').onchange = renderMap; $('mapHot').onchange = renderMap;
+
+/* ---------- statistiques ---------- */
+const bar = (label, v, max, color) => `<div class="bar"><span class="bl">${esc(label)}</span><span class="bt"><i style="width:${max?Math.round(v/max*100):0}%;${color?'background:'+color:''}"></i></span><b>${v}</b></div>`;
+function weekStart(d){ const x = new Date(d); x.setHours(0,0,0,0); x.setDate(x.getDate() - ((x.getDay()+6)%7)); return x; }
+function renderStats(){
+  const L = Object.values(store.leads).filter(l=>!l.ignore), ids = ['stFunnel','stHeat','stWeeks','stSrc','stCity'];
+  if(!L.length){ ids.forEach(id=>{ $(id).innerHTML = '<div class="empty">Pas encore de données.</div>'; }); return; }
+  const cnt = STATUTS.map(s=>[s, L.filter(l=>l.statut===s).length]), mx = Math.max(...cnt.map(c=>c[1]), 1);
+  $('stFunnel').innerHTML = cnt.map(([s,v])=>bar(s,v,mx)).join('');
+  const heat = [['Chauds (≥ 70)',L.filter(l=>l.score>=70).length,'var(--hot)'],['Tièdes (50-69)',L.filter(l=>l.score>=50 && l.score<70).length,'var(--warm)'],['Froids (< 50)',L.filter(l=>l.score<50).length,'var(--mut)']];
+  const hm = Math.max(...heat.map(h=>h[1]), 1); $('stHeat').innerHTML = heat.map(([k,v,c])=>bar(k,v,hm,c)).join('');
+  const w0 = weekStart(new Date()), weeks = [];
+  for(let i=7;i>=0;i--){ const a = new Date(w0); a.setDate(a.getDate()-7*i); const b = new Date(a); b.setDate(b.getDate()+7); weeks.push([a,b]); }
+  const inW = (d,[a,b]) => { const x = new Date(d); return x>=a && x<b; };
+  const contacts = L.flatMap(l=>(l.histo||[]).filter(x=>String(x.t).startsWith('Contact effectué')).map(x=>x.d));
+  const rows = weeks.map(w=>({lbl:w[0].toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'}), add:L.filter(l=>inW(l.date,w)).length, ct:contacts.filter(d=>inW(d,w)).length}));
+  const wm = Math.max(...rows.map(r=>Math.max(r.add,r.ct)), 1);
+  $('stWeeks').innerHTML = `<p class="mut" style="margin:6px 0 4px"><small><b style="color:var(--ac)">■</b> prospects ajoutés · <b style="color:var(--warm)">■</b> contacts effectués (semaine commençant le…)</small></p>` +
+    rows.map(r=>bar(r.lbl+' · ajoutés',r.add,wm) + bar('contacts',r.ct,wm,'var(--warm)')).join('');
+  const SRC = {osm:'OpenStreetMap', sirene:'Base officielle', google:'Google Places'};
+  const bySrc = {}; L.forEach(l=>{ const k = l.source||'osm'; bySrc[k] = (bySrc[k]||0)+1; });
+  const sm = Math.max(...Object.values(bySrc), 1); $('stSrc').innerHTML = Object.entries(bySrc).map(([k,v])=>bar(SRC[k]||k,v,sm)).join('');
+  const byCity = {}; L.forEach(l=>{ const k = l.ville||'—'; byCity[k] = (byCity[k]||0)+1; });
+  const top = Object.entries(byCity).sort((a,b)=>b[1]-a[1]).slice(0,8), cm = Math.max(...top.map(t=>t[1]), 1);
+  $('stCity').innerHTML = top.map(([k,v])=>bar(k,v,cm)).join('');
 }
 
 render(); updateSide(); log('Application chargée.');
