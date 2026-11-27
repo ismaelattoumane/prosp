@@ -98,6 +98,10 @@
   #mapL,#mapF{height:62vh;min-height:340px;border-radius:12px;border:1px solid var(--bd);overflow:hidden;background:var(--card)}
   .kmove{display:none}
   .leaflet-container{background:var(--card)}
+  #mapL{position:relative;z-index:0;isolation:isolate;touch-action:pan-x pan-y}
+  .leaflet-popup-content{margin:12px 14px;font-size:15px;line-height:1.5}
+  .leaflet-popup-content a{display:inline-block;margin-top:6px;padding:8px 12px;border:1px solid #4cc592;border-radius:8px;color:#0e7a50;text-decoration:none !important;font-weight:600}
+  .leaflet-control-zoom a{width:40px !important;height:40px !important;line-height:40px !important}
   .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.9) contrast(.9) saturate(.7)}
   @media (max-width:760px){
     body{display:block}
